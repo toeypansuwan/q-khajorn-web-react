@@ -1,0 +1,63 @@
+.bottom___bar {
+    width: 100%;
+    height: 50px;
+
+    background-color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.line__bar {
+    display: inline-block;
+    width: 80px;
+    height: 4px;
+
+    background: #23235D;
+    border-radius: 10px;
+
+}
+
+.h-screen {
+    height: 100vh;
+}
+
+.map__btn {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    z-index: 10;
+    background-color: white;
+
+    box-shadow: 0px 0px 6px rgba(40, 120, 215, 0.4);
+    color: rgba(40, 120, 215);
+}
+
+.map__btn.active {
+    background-color: rgba(40, 120, 215);
+    color: white;
+}
+
+.map__btn:active {
+    background-color: rgba(40, 120, 215);
+    color: white;
+}
+
+.box-image {
+    flex: 1 0 150px;
+}
+
+.image-fit {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
