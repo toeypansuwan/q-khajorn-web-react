@@ -1,12 +1,40 @@
 import React, { useState } from 'react';
-import { Radio, Slider, InputNumber } from 'antd';
+import { Radio, Slider, InputNumber, Drawer, Space, Button } from 'antd';
 import { Row, Col } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { addFilter } from '../../reducers/filterMarketSlice';
 
-function FilterMapMarket() {
+function FilterMapMarket(props) {
+    const { filerMarketStore } = useSelector((state) => ({ ...state }));
+    const [inputMinValue, setInputMinValue] = useState(filerMarketStore.data.min_price || 1);
+    const [inputMaxValue, setInputMaxValue] = useState(filerMarketStore.data.max_price || 20);
+    const [inputKgValue, setInputKgValue] = useState(filerMarketStore.data.distance || 30);
+    const [selectValue, setSelectValue] = useState(filerMarketStore.data.status || "");
+    const dispatch = useDispatch();
 
-    const [inputMinValue, setInputMinValue] = useState(1);
-    const [inputMaxValue, setInputMaxValue] = useState(20);
-    const [inputKgValue, setInputKgValue] = useState(1);
+    const [height, setHeight] = useState(500);
+
+    const style = {
+        topBorderSiteMenu: {
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+            overflow: 'hidden'
+        }
+    }
+    const onChildrenDrawerClose = () => {
+        props.onChildrenDrawerClose();
+    };
+    const confirmFilter = () => {
+        //filter
+        dispatch(addFilter({
+            status: selectValue,
+            distance: inputKgValue,
+            min_price: inputMinValue,
+            max_price: inputMaxValue,
+        }))
+        //filter end
+        props.onChildrenDrawerClose();
+    }
 
     const onChangeLength = (value) => {
         const min = value[0];
@@ -21,24 +49,40 @@ function FilterMapMarket() {
         setInputMaxValue(max);
     };
     const onChangeRadio = (select) => {
-        console.log(`radio checked:${select}`);
+        setSelectValue(select.target.value);
     };
     const onChangeKg = (kg) => {
         setInputKgValue(kg);
     };
 
     return (
-        <div>
+        <Drawer
+            title="คัดกรองตลาด"
+            placement="bottom"
+            contentWrapperStyle={{ ...style.topBorderSiteMenu }}
+            onClose={onChildrenDrawerClose}
+            bodyStyle={{ paddingTop: 8 }}
+            open={props.childrenDrawer}
+            closable={false}
+            extra={
+                <Space>
+                    <Button variant='outline-secondary' onClick={onChildrenDrawerClose}>ยกเลิก</Button>
+                    <Button type="primary" onClick={confirmFilter}>
+                        แก้ไข
+                    </Button>
+                </Space>
+            }
+        >
             <div className="mb-3">
                 <h6>สถานะ</h6>
-                <Radio.Group onChange={onChangeRadio} defaultValue="a">
-                    <Radio.Button value="a">ทั้งหมด</Radio.Button>
-                    <Radio.Button value="b">มีที่ว่าง</Radio.Button>
-                    <Radio.Button value="c">ไม่มีที่ว่าง</Radio.Button>
+                <Radio.Group onChange={onChangeRadio} defaultValue={selectValue}>
+                    <Radio.Button value="">ทั้งหมด</Radio.Button>
+                    <Radio.Button value="free">มีที่ว่าง</Radio.Button>
+                    <Radio.Button value="full">ไม่มีที่ว่าง</Radio.Button>
                 </Radio.Group>
             </div>
             <div className="mb-3">
-                <h6>สถานะ</h6>
+                <h6>ค่าเช่าตลาด</h6>
                 <Slider onChange={onChangeLength} range defaultValue={[inputMinValue, inputMaxValue]} min={1} max={200} />
                 <Row className="justify-content-between">
                     <Col xs={'auto'} md={3}>
@@ -60,7 +104,7 @@ function FilterMapMarket() {
                 </Row>
             </div>
             <div className="mb-3">
-                <h6>สถานะ</h6>
+                <h6>ระยะทาง</h6>
                 <p className='text-secondary'>ระยะทางสูงสุด 100 กิโลเมตร</p>
                 <Row>
                     <Col>
@@ -81,9 +125,8 @@ function FilterMapMarket() {
                     </Col>
                 </Row>
             </div>
-
-        </div>
+        </Drawer>
     )
 }
 
-export default FilterMapMarket
+export default FilterMapMarket;

@@ -1,30 +1,41 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { LongdoMap, longdo, map } from '../../components/LongdoMap/LongdoMap';
 import data from '../../DataMockup/Data';
-import { Drawer, Space, Input } from 'antd';
+import { Drawer, Input } from 'antd';
 import './SearchMarket.css';
-import { InputGroup, Form, Button, Container, Row, Col, Card } from 'react-bootstrap'
+import { InputGroup, Form, Button, Container, Card } from 'react-bootstrap'
 import { Icon } from '@iconify/react';
 import FilterMarketMap from '../../components/FilterMarketMap/FilterMapMarket';
 import axios from 'axios';
 import liff from '@line/liff';
 import { v4 as uuidv4 } from 'uuid';
+import { useSelector } from 'react-redux';
 
 
 
 function SearchMarketPage() {
+  const store = useSelector((state) => ({ ...state }))
   const mapKey = import.meta.env.VITE_LONGDOMAP_API_KEY;
 
   const [open, setOpen] = useState(false);
   const [height, setHeight] = useState(500);
-  const [childrenDrawer, setChildrenDrawer] = useState(false);
 
+  const [childrenDrawer, setChildrenDrawer] = useState(false);
   const [suggestLocation, setSuggestLocation] = useState([]);
   const [keywordSearch, setKeywordSearch] = useState('');
   const [currentLocation, setCurrentLocation] = useState(false);
   const [zoomMap, setZoomMap] = useState(15);
   const [profile, setProfile] = useState({});
   const [location, setLocation] = useState({});
+  const searchMarket = useRef(null);
+
+  const style = {
+    topBorderSiteMenu: {
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+      overflow: 'hidden'
+    }
+  }
 
   const initMap = async () => {
     map.Layers.setBase(longdo.Layers.NORMAL);
@@ -44,12 +55,12 @@ function SearchMarketPage() {
     map.zoom(zoomMap)
     for (const marker of data) {
       map.Overlays.add(new longdo.Marker(marker.location, {
-        // title: marker.name,
+        title: marker.name,
         icon: {
           url: 'https://map.longdo.com/mmmap/images/pin_mark.png',
           offset: { x: 12, y: 45 }
         },
-        // detail: marker.openCloseTime,
+        detail: marker.openCloseTime,
         visibleRange: { min: 10, max: 20 },
       }));
 
@@ -59,13 +70,9 @@ function SearchMarketPage() {
       //   }
       // ))
     }
-  }
-  const style = {
-    topBorderSiteMenu: {
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
-      overflow: 'hidden'
-    }
+    map.location(longdo.LocationMode.Geolocation)
+    setCurrentLocation(true);
+    setOpen(true);
   }
   const liffFetch = async () => {
     await liff.ready;
@@ -73,27 +80,27 @@ function SearchMarketPage() {
     setProfile(profile)
   }
   useEffect(() => {
-    liffFetch();
-    const getMap = async () => {
-      try {
-        const { map } = (await import('../../components/LongdoMap/LongdoMap'));
-        await map.location(longdo.LocationMode.Geolocation)
-        setCurrentLocation(true);
-        setOpen(true);
-      } catch (err) {
-        console.error(err.message);
-      }
-    }
-    getMap();
-  }, [profile.userId])
-
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(function (position) {
-      setLocation(() => {
-        return { lat: position.coords.latitude, lon: position.coords.longitude }
-      })
-    });
+    liffFetch().catch(console.error);
+    getGeoLocation()
+    // searchListMarket();
   }, [])
+  const getGeoLocation = async () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        setLocation(() => {
+          return { lat: position.coords.latitude, lon: position.coords.longitude }
+        })
+      });
+      await searchListMarket();
+    }
+
+  }
+  const onChildrenDrawerClose = () => {
+    setChildrenDrawer(false);
+  };
+  const showChildrenDrawer = () => {
+    setChildrenDrawer(true);
+  }
 
   const showDrawer = () => {
     console.log(profile)
@@ -103,19 +110,7 @@ function SearchMarketPage() {
   const onClose = () => {
     setOpen(false);
   };
-  const showChildrenDrawer = () => {
-    setChildrenDrawer(true);
-  };
 
-  const onChildrenDrawerClose = () => {
-    setChildrenDrawer(false);
-  };
-  const confirmFilter = () => {
-    //filter
-
-    //filter end
-    setChildrenDrawer(false);
-  }
   const listMarket = () => {
     const lists = data.map((item) => {
       return (
@@ -139,12 +134,15 @@ function SearchMarketPage() {
     })
     return lists;
   }
+
   const doSearch = () => {
     axios(`https://search.longdo.com/mapsearch/json/search?keyword=${keywordSearch}&limit=1&key=${mapKey}`).then((res) => {
       const { lat, lon } = res.data.data[0];
       setZoomMap(12);
       map.location({ lon, lat });
-      map.zoom(zoomMap)
+      map.zoom(zoomMap);
+      setLocation({ lon, lat })
+      searchListMarket();
     }).catch(err => {
       console.log(err);
     })
@@ -178,6 +176,7 @@ function SearchMarketPage() {
   }
   const dropMap = () => {
     setLocation(map.location())
+    searchListMarket();
   }
   const locationUpdate = () => {
   }
@@ -185,9 +184,10 @@ function SearchMarketPage() {
     setSuggestLocation([]);
   }
   const getLocation = async (e) => {
-    const x = await map.location(longdo.LocationMode.Geolocation);
-    await console.log(map.location(longdo.LocationMode.Geolocation));
+    map.location(longdo.LocationMode.Geolocation)
+    getGeoLocation();
     setCurrentLocation(true);
+    searchListMarket();
   }
   const zoomInMap = () => {
     if (zoomMap < 20) setZoomMap(zoomMap + 1);
@@ -196,6 +196,14 @@ function SearchMarketPage() {
   const zoomOutMap = () => {
     if (zoomMap > 1) setZoomMap(zoomMap - 1);
     map.zoom(zoomMap)
+  }
+  const searchListMarket = () => {
+    const data = { ...store.filerMarketStore.data, search: searchMarket.current?.value, lat: location.lat, lon: location.lon }
+    const baseUrl = import.meta.env.VITE_BASE_URL_API;
+    console.log(data)
+    axios.post(`${baseUrl}market/list-filter`, data).then(res => {
+      console.log(res.data)
+    }).catch(console.error)
   }
 
   return (
@@ -211,7 +219,7 @@ function SearchMarketPage() {
         <div className="map__btn" onClick={zoomInMap}><Icon icon="akar-icons:plus" className='fs-4' /></div>
         <div className="map__btn" onClick={zoomOutMap}><Icon icon="akar-icons:minus" className='fs-4' /></div>
       </div>
-      <LongdoMap id="longdo-map" mapKey={mapKey} callback={initMap} markets={data} />
+      <LongdoMap id="longdo-map" mapKey={mapKey} callback={initMap} />
       <Drawer
         placement="bottom"
         height={height}
@@ -228,11 +236,11 @@ function SearchMarketPage() {
           </div>
         </div>
         <InputGroup className="mb-3">
-          <Form.Control placeholder='ชื่อตลาด...' />
+          <Form.Control placeholder='ชื่อตลาด...' ref={searchMarket} />
           <Button variant="outline-secondary" className='p-1' onClick={showChildrenDrawer}>
             <Icon icon="clarity:filter-grid-line" className='fs-2' />
           </Button>
-          <Button variant="primary" >
+          <Button variant="primary" onClick={searchListMarket} >
             <Icon icon="akar-icons:search" />
           </Button>
         </InputGroup>
@@ -243,25 +251,8 @@ function SearchMarketPage() {
             </div>
           </Container>
         </div>
-        <Drawer
-          title="คัดกรองตลาด"
-          placement="bottom"
-          contentWrapperStyle={{ ...style.topBorderSiteMenu }}
-          onClose={onChildrenDrawerClose}
-          bodyStyle={{ paddingTop: 8 }}
-          open={childrenDrawer}
-          closable={false}
-          extra={
-            <Space>
-              <Button variant='outline-secondary' onClick={onChildrenDrawerClose}>ยกเลิก</Button>
-              <Button type="primary" onClick={confirmFilter}>
-                แก้ไข
-              </Button>
-            </Space>
-          }
-        >
-          <FilterMarketMap />
-        </Drawer>
+        <FilterMarketMap onChildrenDrawerClose={onChildrenDrawerClose} childrenDrawer={childrenDrawer} />
+
       </Drawer>
 
       <div className='bottom___bar' onClick={showDrawer}>

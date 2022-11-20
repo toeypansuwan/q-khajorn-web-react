@@ -9,11 +9,6 @@ function LongdoMap(props) {
     map = new window.longdo.Map({
       placeholder: document.getElementById('longdo-map'),
     });
-    // marker = new longdo.Marker({ lon: 99.827787, lat: 13.274825 });
-    // if(props.markets){
-    //    props.markets
-    //     marker = new longdo.Marker({ lon: 100.56, lat: 13.74 });
-    // }
   }
 
   useEffect(() => {
@@ -29,6 +24,8 @@ function LongdoMap(props) {
         mapCallback();
         if (callback) callback();
       };
+    //   if (existingScript) this.mapCallback();
+    // if (existingScript && callback) callback();
       return()=>{
         document.getElementById('longdoMapScript').remove();
       }
