@@ -3,10 +3,9 @@ import './App.css'
 import 'antd/dist/antd.css';
 import Routing from './AppRouting'
 
-
-
 function App() {
   const liffId = import.meta.env.VITE_PUBLIC_LIFF_ID;
+
   // useEffect(() => {
   //   const liffFetch = async () => {
   //     const liff = (await import('@line/liff')).default;

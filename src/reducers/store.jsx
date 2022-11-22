@@ -3,7 +3,7 @@ import filterMarketSlice from './filterMarketSlice'
 
 const store = configureStore({
     reducer: {
-        filerMarketStore: filterMarketSlice,
+        filterMarketStore: filterMarketSlice,
     }
 })
 export default store;

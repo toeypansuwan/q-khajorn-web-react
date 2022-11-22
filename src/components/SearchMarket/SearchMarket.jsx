@@ -1,21 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { LongdoMap, longdo, map } from '../../components/LongdoMap/LongdoMap';
-import data from '../../DataMockup/Data';
+import { LongdoMap, longdo, map } from '../LongdoMap/LongdoMap';
+import data from '../../DataMockup/data';
 import { Drawer, Input } from 'antd';
+import { Link } from 'react-router-dom'
 import './SearchMarket.css';
 import { InputGroup, Form, Button, Container, Card } from 'react-bootstrap'
 import { Icon } from '@iconify/react';
-import FilterMarketMap from '../../components/FilterMarketMap/FilterMapMarket';
+import FilterMarketMap from '../FilterMarketMap/FilterMapMarket';
 import axios from 'axios';
 import liff from '@line/liff';
 import { v4 as uuidv4 } from 'uuid';
 import { useSelector } from 'react-redux';
-
-
-
-function SearchMarketPage() {
+import * as moment from 'moment';
+import th from 'moment/dist/locale/th';
+moment.locale('th', th);
+console.log()
+function SearchMarket(props) {
   const store = useSelector((state) => ({ ...state }))
+
   const mapKey = import.meta.env.VITE_LONGDOMAP_API_KEY;
+  const baseUrl = import.meta.env.VITE_BASE_URL_API;
 
   const [open, setOpen] = useState(false);
   const [height, setHeight] = useState(500);
@@ -28,6 +32,7 @@ function SearchMarketPage() {
   const [profile, setProfile] = useState({});
   const [location, setLocation] = useState({});
   const searchMarket = useRef(null);
+  const [listData, setListData] = useState({ data: [], load: false });
 
   const style = {
     topBorderSiteMenu: {
@@ -81,20 +86,7 @@ function SearchMarketPage() {
   }
   useEffect(() => {
     liffFetch().catch(console.error);
-    getGeoLocation()
-    // searchListMarket();
   }, [])
-  const getGeoLocation = async () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        setLocation(() => {
-          return { lat: position.coords.latitude, lon: position.coords.longitude }
-        })
-      });
-      await searchListMarket();
-    }
-
-  }
   const onChildrenDrawerClose = () => {
     setChildrenDrawer(false);
   };
@@ -103,7 +95,7 @@ function SearchMarketPage() {
   }
 
   const showDrawer = () => {
-    console.log(profile)
+    // console.log(profile)
     setOpen(true);
   };
 
@@ -112,23 +104,25 @@ function SearchMarketPage() {
   };
 
   const listMarket = () => {
-    const lists = data.map((item) => {
+    const lists = listData.data.map((item) => {
       return (
         <div key={uuidv4()}>
-          <Card className='flex-row text-start disable'>
-            <div className="box-image">
-              <Card.Img variant="start" src={`../../../public/${item.image}`} className='image-fit' />
-            </div>
-            <Card.Body>
-              <Card.Title className='h6'>{item.name}</Card.Title>
-              <Card.Text className='fs-6'>
-                {item.openCloseTime}<br />
-                {item.open}
-              </Card.Text>
-              <Card.Text className='fs-6'>{profile.displayName}</Card.Text>
-              <Button variant='outline-secondary' onClick={() => { liff.logout(); window.location.reload() }}>log</Button>
-            </Card.Body>
-          </Card>
+          <Link to={`/profile-market/${item.id}`} className=" text-decoration-none">
+            <Card className='flex-row text-start disable '>
+              <div className="box-image">
+                <Card.Img variant="start" src={`${baseUrl}upload/market/${item.image}`} className='image-fit' />
+              </div>
+              <Card.Body>
+                <Card.Title className='h6'>{item.name}</Card.Title>
+                <Card.Text className='fs-6'>
+                  {moment(item.time_open, 'th').format('LT')} น.<br />
+                  {moment(item.time_close, 'th').format('LT')} น.
+                </Card.Text>
+                {/* <Card.Text className='fs-6'>{profile.displayName}</Card.Text> */}
+                {/* <Button variant='outline-secondary' onClick={() => { liff.logout(); window.location.reload() }}>log</Button> */}
+              </Card.Body>
+            </Card>
+          </Link>
         </div>
       )
     })
@@ -176,8 +170,10 @@ function SearchMarketPage() {
   }
   const dropMap = () => {
     setLocation(map.location())
-    searchListMarket();
   }
+  useEffect(() => {
+    searchListMarket();
+  }, [location])
   const locationUpdate = () => {
   }
   const clickMap = () => {
@@ -185,7 +181,7 @@ function SearchMarketPage() {
   }
   const getLocation = async (e) => {
     map.location(longdo.LocationMode.Geolocation)
-    getGeoLocation();
+    props.getGeoLocation();
     setCurrentLocation(true);
     searchListMarket();
   }
@@ -198,12 +194,10 @@ function SearchMarketPage() {
     map.zoom(zoomMap)
   }
   const searchListMarket = () => {
-    const data = { ...store.filerMarketStore.data, search: searchMarket.current?.value, lat: location.lat, lon: location.lon }
-    const baseUrl = import.meta.env.VITE_BASE_URL_API;
-    console.log(data)
+    const data = { ...store.filterMarketStore.data, search: searchMarket.current?.value }
     axios.post(`${baseUrl}market/list-filter`, data).then(res => {
-      console.log(res.data)
-    }).catch(console.error)
+      setListData({ data: res.data, load: true });
+    }).catch(err => console.error(err.response.data.message.message))
   }
 
   return (
@@ -247,12 +241,11 @@ function SearchMarketPage() {
         <div className="position-absolute bottom-0 start-0 overflow-scroll w-100 text-center" style={{ height: 390 }}>
           <Container>
             <div className="d-grid gap-3">
-              {listMarket()}
+              {listData.load ? listMarket() : <div></div>}
             </div>
           </Container>
         </div>
-        <FilterMarketMap onChildrenDrawerClose={onChildrenDrawerClose} childrenDrawer={childrenDrawer} />
-
+        {childrenDrawer ? <FilterMarketMap onChildrenDrawerClose={onChildrenDrawerClose} childrenDrawer={childrenDrawer} /> : <div></div>}
       </Drawer>
 
       <div className='bottom___bar' onClick={showDrawer}>
@@ -264,4 +257,4 @@ function SearchMarketPage() {
   )
 }
 
-export default SearchMarketPage
+export default SearchMarket
