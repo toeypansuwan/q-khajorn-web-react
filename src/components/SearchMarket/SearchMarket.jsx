@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux';
 import * as moment from 'moment';
 import th from 'moment/dist/locale/th';
 moment.locale('th', th);
-console.log()
+
 function SearchMarket(props) {
   const store = useSelector((state) => ({ ...state }))
 

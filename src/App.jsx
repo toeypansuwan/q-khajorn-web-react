@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import './App.css'
-import 'antd/dist/antd.css';
 import Routing from './AppRouting'
+
+import 'antd/dist/antd.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css'
 
 function App() {
   const liffId = import.meta.env.VITE_PUBLIC_LIFF_ID;
