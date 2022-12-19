@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import SearchMarket from '../../components/SearchMarket/SearchMarket';
 import { addFilter } from '../../reducers/filterMarketSlice';
 import { useDispatch } from 'react-redux';
-import { Spin } from 'antd';
 import Loading from '../../services/Loading/Loading';
 
 function FirstPage() {

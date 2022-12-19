@@ -1,0 +1,12 @@
+.h-70 {
+    height: 70vh;
+}
+
+.bg {
+    background-color: #F1F5FA;
+}
+
+.ant-tabs-nav {
+    padding-left: 1rem;
+    background-color: white;
+}

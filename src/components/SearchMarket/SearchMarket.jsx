@@ -13,6 +13,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { useSelector } from 'react-redux';
 import * as moment from 'moment';
 import th from 'moment/dist/locale/th';
+import { useDispatch } from 'react-redux';
+import { setIdMarket } from '../../reducers/historyMarketSlice';
 moment.locale('th', th);
 
 function SearchMarket(props) {
@@ -33,6 +35,7 @@ function SearchMarket(props) {
   const [location, setLocation] = useState({});
   const searchMarket = useRef(null);
   const [listData, setListData] = useState({ data: [], load: false });
+  const dispatch = useDispatch();
 
   const style = {
     topBorderSiteMenu: {
@@ -102,12 +105,16 @@ function SearchMarket(props) {
   const onClose = () => {
     setOpen(false);
   };
+  const saveIdMarket = (id) => {
+    console.log(id)
+    dispatch(setIdMarket(id))
+  }
 
   const listMarket = () => {
     const lists = listData.data.map((item) => {
       return (
         <div key={uuidv4()}>
-          <Link to={`/profile-market/${item.id}`} className=" text-decoration-none">
+          <Link to={`/profile-market/${item.id}`} className=" text-decoration-none" onClick={() => saveIdMarket(item.id)}>
             <Card className='flex-row text-start disable '>
               <div className="box-image">
                 <Card.Img variant="start" src={`${baseUrl}upload/market/${item.image}`} className='image-fit' />

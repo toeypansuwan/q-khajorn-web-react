@@ -1,8 +1,9 @@
 import React, { lazy, useState, useEffect } from 'react'
 import { Select } from 'antd';
 import axios from 'axios';
-import { useParams, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import ImageMapSection from '../../components/ImageMapSection/ImageMapSection';
+import { Icon } from '@iconify/react'
 import "./ZonePage.css"
 
 function ZonePage() {
@@ -16,7 +17,10 @@ function ZonePage() {
         getImagePlan();
         getZoneCategories();
     }, [])
-
+    const navigate = useNavigate();
+    const handleBack = () => {
+        navigate(-1);
+    }
     const getZone = (category_id = null) => {
         axios.post(`${BASE_URL_API}market/${id}/zone`, { category_id }).then(res => {
             const mapArea = res.data.map((zone) => {
@@ -46,8 +50,8 @@ function ZonePage() {
         })
     }
     const getImagePlan = () => {
-        axios.get(`${BASE_URL_API}market/${id}/image-plan`).then(res => {
-            setPlan(i => { return { image: `${BASE_URL_API}upload/market/${res.data.image_plan}` } });
+        axios.get(`${BASE_URL_API}market/${id}/image-plan-market`).then(res => {
+            setPlan({ image: `${BASE_URL_API}upload/market/${res.data.image_plan}` });
         }).catch(err => {
             console.error(err.response)
         })
@@ -71,6 +75,11 @@ function ZonePage() {
     return (
         <div className='h-zone-page'>
             <div className="h-15vh container py-3">
+                <div className=" position-relative mb-3">
+                    <button onClick={handleBack} className='btn position-absolute start-0 top-50 translate-middle-y'><Icon icon="eva:arrow-ios-back-fill" className='fs-3' /></button>
+                    <h3 className='text-center'>เลือกโซน</h3>
+                </div>
+
                 <p>เลือกประเภทสินค้า</p>
                 <Select
                     defaultValue={selectData[0].value}
@@ -81,9 +90,9 @@ function ZonePage() {
                     options={selectData}
                 />
             </div>
-            <ImageMapSection plan={plan.image} mapArea={zoneData} />
+            <ImageMapSection plan={plan.image} mapArea={zoneData} className="h-85vh" />
 
-        </div>
+        </div >
     )
 }
 
