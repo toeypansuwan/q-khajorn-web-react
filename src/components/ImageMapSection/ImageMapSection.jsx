@@ -1,8 +1,11 @@
+import { Icon } from '@iconify/react';
 import React, { useState, useRef, useEffect } from 'react'
 // import { ImageMap } from "@qiuz/react-image-map";
 import ImageMapper from 'react-img-mapper';
 import { v4 } from 'uuid';
 import './ImageMapSection.css'
+import moment from 'moment/moment';
+import { useSelector } from 'react-redux';
 const getCenterPoint = (shape, coords) => {
     if (shape === 'circle') {
         const [x, y, r] = coords;
@@ -27,6 +30,7 @@ const getCenterPoint = (shape, coords) => {
     }
 };
 function ImageMapSection(props) {
+    const { reserveStore } = useSelector(state => ({ ...state }))
     const [zoom, setZoom] = useState(1);
     const [areasMap, setAreasMap] = useState([]);
     const componentRef = useRef();
@@ -49,21 +53,22 @@ function ImageMapSection(props) {
     };
     useEffect(() => {
         setAreasMap(props.mapArea);
-
     }, [props.mapArea])
     useEffect(() => {
         setWidthImage();
     }, [props.plan])
     useEffect(() => {
         const handleWheel = (event) => {
-            // Handle wheel zoom here
             handleWheel2(event, parent)
         };
-
-        componentRef.current.addEventListener('wheel', handleWheel, parent);
-
+        if (componentRef.current) {
+            componentRef.current.addEventListener('wheel', handleWheel, parent);
+        }
         return () => {
-            componentRef.current.removeEventListener('wheel', handleWheel);
+
+            if (componentRef.current) {
+                componentRef.current.removeEventListener('wheel', handleWheel);
+            }
         };
     }, [zoom]);
 
@@ -113,7 +118,9 @@ function ImageMapSection(props) {
                             pointerEvents: 'none'
                         }}
                     >
-                        {area.title}
+                        {reserveStore.data.some(i =>
+                            i.id === area.id && i.days.some(d => d === moment(area.day).format("YYYY-MM-DD"))
+                        ) ? (<Icon icon='akar-icons:circle-check' className='fs-5 text-success' />) : area.title}
                     </span>
                 );
             })}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { LongdoMap, longdo, map } from '../LongdoMap/LongdoMap';
-import data from '../../DataMockup/data';
+// import data from '../../DataMockup/data';
 import { Drawer, Input } from 'antd';
 import { Link } from 'react-router-dom'
 import './SearchMarket.css';
@@ -14,7 +14,6 @@ import { useSelector } from 'react-redux';
 import * as moment from 'moment';
 import th from 'moment/dist/locale/th';
 import { useDispatch } from 'react-redux';
-import { setIdMarket } from '../../reducers/historyMarketSlice';
 moment.locale('th', th);
 
 function SearchMarket(props) {
@@ -61,23 +60,23 @@ function SearchMarket(props) {
     map.Event.bind('location', locationUpdate);
     map.Event.bind('click', clickMap);
     map.zoom(zoomMap)
-    for (const marker of data) {
-      map.Overlays.add(new longdo.Marker(marker.location, {
-        title: marker.name,
-        icon: {
-          url: 'https://map.longdo.com/mmmap/images/pin_mark.png',
-          offset: { x: 12, y: 45 }
-        },
-        detail: marker.openCloseTime,
-        visibleRange: { min: 10, max: 20 },
-      }));
+    // for (const marker of data) {
+    //   map.Overlays.add(new longdo.Marker(marker.location, {
+    //     title: marker.name,
+    //     icon: {
+    //       url: 'https://map.longdo.com/mmmap/images/pin_mark.png',
+    //       offset: { x: 12, y: 45 }
+    //     },
+    //     detail: marker.openCloseTime,
+    //     visibleRange: { min: 10, max: 20 },
+    //   }));
 
-      // map.Overlays.add(new longdo.Popup(marker.location,
-      //   {
-      //     html: `<div style="background: #fff;padding:5px 10px;border-radius:20px;width:max-content">${marker.name}</div>`,
-      //   }
-      // ))
-    }
+    //   // map.Overlays.add(new longdo.Popup(marker.location,
+    //   //   {
+    //   //     html: `<div style="background: #fff;padding:5px 10px;border-radius:20px;width:max-content">${marker.name}</div>`,
+    //   //   }
+    //   // ))
+    // }
     map.location(longdo.LocationMode.Geolocation)
     setCurrentLocation(true);
     setOpen(true);
@@ -105,16 +104,12 @@ function SearchMarket(props) {
   const onClose = () => {
     setOpen(false);
   };
-  const saveIdMarket = (id) => {
-    console.log(id)
-    dispatch(setIdMarket(id))
-  }
 
   const listMarket = () => {
     const lists = listData.data.map((item) => {
       return (
         <div key={uuidv4()}>
-          <Link to={`/profile-market/${item.id}`} className=" text-decoration-none" onClick={() => saveIdMarket(item.id)}>
+          <Link to={`/profile-market/${item.id}`} className=" text-decoration-none">
             <Card className='flex-row text-start disable '>
               <div className="box-image">
                 <Card.Img variant="start" src={`${baseUrl}upload/market/${item.image}`} className='image-fit' />

@@ -1,12 +1,75 @@
-.site__bg{
-    height: 70vh;
-    position: fixed;
-    left: 0;
+.icon {
+    transition: all 0.3s ease-in;
+}
+
+.icon.rotate-icon {
+    transform: rotate(-180deg)
+}
+
+.top-up {
     width: 100%;
-    border-top-left-radius:10px ;
-    border-top-right-radius: 10px;
-    padding: 1rem;
-    background-color: white;
-    bottom: 0;
-    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.25);
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateY(-100%);
+    z-index: 11;
+
+    /* box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.25); */
+}
+
+.top-up::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    z-index: -1;
+    box-shadow: 0px -4px 3px rgba(0, 0, 0, 0.05);
+
+}
+
+.box_image {
+    height: 77px;
+}
+
+.box_image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.react-calendar__tile {
+    position: relative;
+}
+
+.react-calendar__tile .status::before {
+    right: 0px;
+    top: 0px;
+    border-bottom: 1rem solid transparent;
+    position: absolute;
+    content: "";
+}
+
+.react-calendar__tile .status__success::before {
+    border-right: 1rem solid rgba(88, 202, 69);
+}
+
+.react-calendar__tile .status__danger::before {
+    border-right: 1rem solid #dc3545;
+}
+
+.before_danger::before {
+    background: #dc3545;
+}
+
+.before_status::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+}
+
+.before_success::before {
+    background: rgba(88, 202, 69);
 }

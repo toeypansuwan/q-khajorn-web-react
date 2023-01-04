@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import filterMarketSlice from './filterMarketSlice'
-import historyMarketSlice from './historyMarketSlice';
+import reserveSlice from './reserveSlice';
 
 const store = configureStore({
     reducer: {
         filterMarketStore: filterMarketSlice,
-        historyMarketStore: historyMarketSlice,
+        reserveStore: reserveSlice,
     }
 })
 export default store;

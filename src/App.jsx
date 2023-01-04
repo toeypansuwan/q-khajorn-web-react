@@ -3,6 +3,7 @@ import Routing from './AppRouting'
 
 import 'antd/dist/antd.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle'
 import './App.css'
 
 function App() {

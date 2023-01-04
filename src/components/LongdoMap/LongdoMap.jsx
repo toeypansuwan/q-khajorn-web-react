@@ -1,5 +1,4 @@
 import React,{useEffect} from 'react'
-import data from '../../DataMockup/Data';
 let longdo;
 let map;
 
