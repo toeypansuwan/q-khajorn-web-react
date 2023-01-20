@@ -9,6 +9,8 @@ import { useRef } from 'react'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid';
 import { nameDaysFormat } from '../../services/services'
+import { useDispatch } from 'react-redux';
+import { setIdMarket } from '../../reducers/reserveSlice';
 
 import "swiper/css/pagination";
 import "swiper/css";
@@ -18,6 +20,7 @@ import th from 'moment/dist/locale/th';
 moment.locale('th', th);
 
 function ProfileMarket() {
+    const dispatch = useDispatch();
     const BASE_URL_API = import.meta.env.VITE_BASE_URL_API;
     const { id } = useParams();
     const navigate = useNavigate();
@@ -34,6 +37,7 @@ function ProfileMarket() {
 
     useEffect(() => {
         getProfile();
+        dispatch(setIdMarket(id));
     }, [])
 
     const getProfile = () => {

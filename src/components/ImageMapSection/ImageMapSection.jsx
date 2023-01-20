@@ -120,7 +120,7 @@ function ImageMapSection(props) {
                     >
                         {reserveStore.data.some(i =>
                             i.id === area.id && i.days.some(d => d === moment(area.day).format("YYYY-MM-DD"))
-                        ) ? (<Icon icon='akar-icons:circle-check' className='fs-5 text-success' />) : area.title}
+                        ) && props.type === 'section' ? (<Icon icon='akar-icons:circle-check' className='fs-5 text-success' />) : area.title}
                     </span>
                 );
             })}

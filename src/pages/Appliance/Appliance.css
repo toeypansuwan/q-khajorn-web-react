@@ -1,0 +1,52 @@
+.card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-setting {
+    display: grid;
+    grid-template-columns: calc(100% / 3) 1fr;
+    grid-template-rows: minmax(100px, auto);
+}
+
+.box-scroll-card {
+    height: 350px;
+    overflow: scroll;
+}
+
+.box-card {
+    display: grid;
+    gap: 1rem;
+}
+
+.tranfer-appliances {
+    /* Make the Transfer container take up 100% of the available width */
+    width: 100%;
+    gap: 0.5rem;
+}
+
+/* Apply the following styles to the list */
+.tranfer-appliances .ant-transfer-list {
+    /* Make the list take up 50% of the available width on screens smaller than 768px */
+    width: 50%;
+
+    /* Make the list take up 100% of the available width on screens larger than 768px */
+}
+
+
+@media (max-width: 768px) {
+    .tranfer-appliances {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .tranfer-appliances .ant-transfer-list {
+        width: 100%;
+    }
+
+    .tranfer-appliances .box-card {
+        height: 350px;
+        overflow: scroll;
+    }
+}

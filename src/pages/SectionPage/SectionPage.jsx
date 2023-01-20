@@ -1,14 +1,18 @@
 import axios from 'axios';
-import React, { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import React, { useState, useEffect, useRef, lazy } from 'react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import ImageMapSection from '../../components/ImageMapSection/ImageMapSection';
 import moment from 'moment';
 import th from 'moment/dist/locale/th';
+import { getDays, getLengthDayOfMonth, getMarkerDate, getSection, BASE_URL_API } from '../../services/services'
 import { Tabs } from 'antd';
-import { Container, Badge } from 'react-bootstrap'
+import { Container, Button } from 'react-bootstrap'
 import { v4 as uuidv4 } from 'uuid';
 import { Icon } from '@iconify/react'
 import SiteFixBottom from '../../components/SiteFixBottom/SiteFixBottom';
+// const SiteFixBottom = lazy(() => import('../../components/SiteFixBottom/SiteFixBottom'))
+import { useDispatch } from 'react-redux';
+import { setIdZone } from '../../reducers/reserveSlice';
 import './SectionPage.css'
 moment.locale('th', th);
 
@@ -16,8 +20,8 @@ function SectionPage() {
     const { id } = useParams();
     const [itemsTab, setItemsTab] = useState([]);
     const dataFetchedRef = useRef(false);
-    const BASE_URL_API = import.meta.env.VITE_BASE_URL_API;
     const [dataTopUp, setDataTopUp] = useState({});
+    const dispatch = useDispatch()
     const [data, setData] = useState([{
         id: 1,
         title: "a1",
@@ -40,34 +44,23 @@ function SectionPage() {
     }
 
     useEffect(() => {
+        dispatch(setIdZone(id));
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
         configTaps();
     }, [])
     useEffect(() => {
-        console.log("new", data);
+        // console.log("new", data);
     }, [data])
 
-    const getLengthDayOfMonth = (date = null) => {
-        let currentDay;
-        if (date) {
-            currentDay = moment(date);
-        } else {
-            currentDay = moment().startOf('day');
-        }
-        const endDayOfMonth = moment().endOf('month');
-        // console.log("statt", currentDay.format("DD-MM-YYYY"), "end", endDayOfMonth.format("DD-MM-YYYY"))
-        // .add(2, 'month')
-        return endDayOfMonth.diff(currentDay, 'days');
-    }
     const configTaps = async () => {
-        const days = await getDays();
+        const days = await getDays(id);
         try {
             for (let index = 0; index < getLengthDayOfMonth(); index++) {
                 const day = new Date(moment(moment().startOf('day'), "DD-MM-YYYY").add(index, 'days').format('YYYY-MM-DD'))
                 const isDay = day.toLocaleDateString('en', { weekday: 'long' });
                 if (days.includes(isDay)) {
-                    const { mapArea } = await getSection(day);
+                    const { mapArea } = await getSection({ d: day, id });
                     const plan = await getImagePlan();
                     setItemsTab(i => {
                         return [
@@ -75,42 +68,18 @@ function SectionPage() {
                             {
                                 label: <DaysList days={day} />,
                                 key: day,
-                                children: <ImageMapSection plan={plan} mapArea={mapArea} className="h-70" onClick={onClickSection} onLoad={(s, e) => { console.log(e) }} />,
+                                children: <ImageMapSection type="section" plan={plan} mapArea={mapArea} className="h-70" onClick={onClickSection} onLoad={(s, e) => { console.log(e) }} />,
                             },
                         ]
                     })
                 }
             }
         } catch (err) {
-            console.log(err)
+            console.error(err)
         }
     }
-    const getMarkerDate = async (date) => {
-        try {
-            const days = await getDays();
-            let data = [];
-            for (let index = 0; index < getLengthDayOfMonth(date); index++) {
-                const day = new Date(moment(date).add(index, 'days').format('YYYY-MM-DD'))
-                const isDay = day.toLocaleDateString('en', { weekday: 'long' });
-                if (days.includes(isDay)) {
-                    const { mapArea } = await getSection(day);
-                    data.push(...mapArea.map(i => ({ id: i.id, status: i.status, day: moment(i.day).format("YYYY-MM-DD"), color: i.preFillColor })))
-                }
-            }
-            return data;
-        } catch (err) {
-            console.log(err)
-        }
-    }
-    const getDays = async () => {
-        try {
-            const res = await axios.get(`${BASE_URL_API}market/${id}/open-days`)
-            const days = res.data.map(i => i.dayname);
-            return days;
-        } catch (err) {
-            console.log(err)
-        }
-    }
+
+
     const DaysList = (props) => {
         return (
             <div className="text-center">
@@ -120,38 +89,6 @@ function SectionPage() {
             </div>
         )
     };
-    const getSection = (d) => {
-        const date = moment(d).format("YYYY-MM-DD")
-        return new Promise((resolve, reject) => {
-            axios.post(`${BASE_URL_API}market/${id}/section`, { date }).then(res => {
-                const mapArea = res.data.map((section) => {
-                    const { id, color, name, points, shape, price, image, status } = section;
-                    const polygon = points.map(p => {
-                        const { axis_x, axis_y } = p;
-                        return [axis_x, axis_y];
-                    })
-                    return {
-                        id,
-                        title: name,
-                        price,
-                        shape: shape,
-                        fillColor: color,
-                        strokeColor: "black",
-                        preFillColor: color,
-                        coords: polygon.flat(1),
-                        polygon,
-                        image,
-                        status,
-                        day: d
-                    }
-                })
-                resolve({ mapArea });
-            }).catch(err => {
-                console.error(err.response)
-                reject(err);
-            })
-        })
-    }
     const closeTopUp = () => {
         setTopup(false)
     }
@@ -161,7 +98,8 @@ function SectionPage() {
             title: e.title,
             image: `${BASE_URL_API}upload/market/${e.image}`,
             price: e.price,
-            day: e.day
+            day: e.day,
+            status: e.status,
         })
         setTopup(true)
     }
@@ -194,7 +132,9 @@ function SectionPage() {
                     </Tabs.TabPane>
                 ))}
             </Tabs>
-            <SiteFixBottom dataTopUp={dataTopUp} getMarkerDate={getMarkerDate} openTopup={topup} onCloseTopUp={closeTopUp} />
+            <SiteFixBottom dataTopUp={dataTopUp} getMarkerDate={getMarkerDate} openTopup={topup} onCloseTopUp={closeTopUp} >
+                <Button slot='buttonNext' as={Link} to={`/profile-market/${id}/section/appliance`} className='w-100'>ทำการจอง</Button>
+            </SiteFixBottom>
         </ >
     )
 }

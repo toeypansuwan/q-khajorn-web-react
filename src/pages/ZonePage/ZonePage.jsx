@@ -38,7 +38,7 @@ function ZonePage() {
                     preFillColor: color,
                     coords: polygon.flat(1),
                     polygon,
-                    href: `/profile-market/${id}/section`
+                    // href: `/profile-market/${id}/section`
                 }
 
             })
@@ -71,6 +71,9 @@ function ZonePage() {
         }
         getZone(category_id);
     };
+    const onChangePage = (e) => {
+        navigate(`/profile-market/${e.id}/section`)
+    }
 
     return (
         <div className='h-zone-page'>
@@ -90,7 +93,7 @@ function ZonePage() {
                     options={selectData}
                 />
             </div>
-            <ImageMapSection plan={plan.image} mapArea={zoneData} className="h-85vh" />
+            <ImageMapSection plan={plan.image} mapArea={zoneData} onClick={onChangePage} className="h-85vh" />
 
         </div >
     )
