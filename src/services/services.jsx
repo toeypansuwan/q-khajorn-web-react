@@ -24,30 +24,20 @@ const nameDaysFormat = (nameday) => {
 
 
 const binarySearch = (array, target, prop) => {
-    // Initialize the start and end indices of the search range
     let start = 0;
     let end = array.length - 1;
-
-    // Iterate until the start and end indices meet
     while (start <= end) {
-        // Calculate the midpoint of the search range
         const mid = Math.floor((start + end) / 2);
-
-        // If the target is less than the value of the specified property at the midpoint, update the end index
         if (target < array[mid][prop]) {
             end = mid - 1;
         }
-        // If the target is greater than the value of the specified property at the midpoint, update the start index
         else if (target > array[mid][prop]) {
             start = mid + 1;
         }
-        // If the target is equal to the value of the specified property at the midpoint, return the midpoint index
         else {
             return mid;
         }
     }
-
-    // If the target is not found, return -1
     return -1;
 }
 

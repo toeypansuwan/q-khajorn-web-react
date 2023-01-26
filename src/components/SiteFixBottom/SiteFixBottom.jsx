@@ -142,7 +142,7 @@ function SiteFixBottom({
         onCloseTopUp()
     }
     return (
-        <div className={`w-100 bg-white shadow-custom ${isShowCart ? 'position-fixed start-0 bottom-0' : 'position-relative'}`} style={{ zIndex: 10 }}>
+        <div className={`position-fixed start-0 bottom-0 left w-100 bg-white shadow-custom ${isShowCart ? 'position-fixed start-0 bottom-0' : 'position-relative'}`} style={{ zIndex: 10 }}>
             <Container className='py-3'>
                 <Row className=' align-items-center' >
                     <Col xs={'auto'}><h5>แผงที่เลือกไว้</h5></Col>
@@ -173,7 +173,7 @@ function SiteFixBottom({
                             reserveStore.data.reduce((total, cur) => {
                                 const days = cur.days.length;
                                 const appliPrice = reserveStore.services.appliances.reduce((totalAppli, curAppli) => totalAppli + curAppli.price * curAppli.amount, 0) * days
-                                const service = reserveStore.services.service * days;
+                                const service = reserveStore.services.service.price * days;
                                 return total + cur.price * days + appliPrice + service;
                             }, 0)
                         } บาท</h3>

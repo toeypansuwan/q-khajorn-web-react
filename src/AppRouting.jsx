@@ -7,10 +7,12 @@ const ProfileMarket = lazy(() => import('./pages/ProfileMarket/ProfileMarket'));
 const ZonePage = lazy(() => import('./pages/ZonePage/ZonePage'));
 const SectionPage = lazy(() => import('./pages/SectionPage/SectionPage'));
 const Appliance = lazy(() => import('./pages/Appliance/Appliance'));
+const LoginPage = lazy(() => import('./pages/Login/LoginPage'));
 
 function AppRouting() {
   return (
-    <BrowserRouter>
+    // <BrowserRouter basename='/dist'>
+    <BrowserRouter >
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path='/' element={<FirstPage />} />
@@ -20,6 +22,7 @@ function AppRouting() {
             <Route path=':id/section' element={<SectionPage />} />
             <Route path=':id/section/appliance' element={<Appliance />} />
           </Route>
+          <Route path='/login' element={<LoginPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

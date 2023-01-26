@@ -8,5 +8,8 @@ export default defineConfig({
     moment: {
       noGlobal: true
     }
+  },
+  build: {
+    outDir: './dist'
   }
 })

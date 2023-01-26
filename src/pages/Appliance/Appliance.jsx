@@ -4,13 +4,12 @@ import { Button, Row, Col, Container } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getMarkerDate, BASE_URL_API } from '../../services/services'
 import { Icon } from '@iconify/react'
-import { Switch, Space } from 'antd';
 import axios from 'axios'
-import { Card, Input, Button as AntBtn } from 'antd';
+import { Card, Switch, Space, Input, Button as AntBtn, message, Transfer, Modal } from 'antd';
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux'
 import { setService as setServiceStore, addAppliances, editAppliances, removeAppliances } from '../../reducers/reserveSlice';
-import { Transfer, Modal, Button as ButtonAnt } from 'antd';
+
 import './Appliance.css'
 import liff from '@line/liff'
 function Appliance() {
@@ -21,6 +20,7 @@ function Appliance() {
     const [service, setService] = useState({});
     const [profile, setProfile] = useState();
     const navigate = useNavigate();
+    const [messageApi, contextHolder] = message.useMessage();
     const handleBack = () => {
         navigate(-1);
     }
@@ -43,7 +43,7 @@ function Appliance() {
                 url: `${BASE_URL_API}market/${reserveStore.id_market}/service-price`,
             });
             setAppliances(newData);
-            const isCheck = reserveStore.services.service === 100 ? 1 : 0;
+            const isCheck = reserveStore.services.service.status;
             setService({ ...dataService, isCheck });
         }
         const liffFetch = async () => {
@@ -91,10 +91,6 @@ function Appliance() {
             dispatch(addAppliances({ id: item.id, price: item.price, amount: input }))
         }
     }
-    const onSwich = () => {
-        const isSer = !service.isCheck ? 1 : 0
-        dispatch(setServiceStore({ price: service.price * isSer }))
-    }
     const [targetKeys, setTargetKeys] = useState([]);
     const [selectedKeys, setSelectedKeys] = useState([]);
     const onChange = (nextTargetKeys, direction, moveKeys) => {
@@ -118,6 +114,7 @@ function Appliance() {
     const renderListItem = (item) => {
         return (
             <>
+
                 <Card
                     className='card-setting rounded overflow-hidden'
                     cover={<img className='card-img' src={`${BASE_URL_API}upload/market/${item.image}`} alt="" />}
@@ -156,7 +153,7 @@ function Appliance() {
             line_id: profile.userId,
             market_id: reserveStore.id_market,
             zone_id: reserveStore.id_zone,
-            service: 1,
+            service: reserveStore.services.service.status ? 1 : 0,
             sections: reserveStore.data.map(i => ({
                 id: i.id,
                 days: i.days
@@ -169,11 +166,15 @@ function Appliance() {
         axios.post(`${BASE_URL_API}order/create`, data).then(res => {
             if (res.data.res_code == 200) liff.closeWindow();
         }).catch(err => {
-            console.error(err)
+            messageApi.open({
+                type: 'error',
+                content: err.response.data.message
+            })
         })
     }
     return (
         <>
+            {contextHolder}
             <Modal
                 title="เพิ่ม/ลด อุปกรณ์เสริมต้องการเช่า"
                 open={isModalOpen}
@@ -220,7 +221,11 @@ function Appliance() {
                         <div className="">
                             <h5>บริการไฟฟ้า</h5>
                             <p className='text-secondary mb-3'>หากเลือกบริการนี้จะสามารถใช้ไฟฟ้าในแผงตนเองได้ อาจมีค่าบริการไฟฟ้าเพิ่มเติม {service?.price || 0} บาท</p>
-                            <Switch checked={service.isCheck} onClick={() => setService(prev => ({ ...prev, isCheck: !prev.isCheck }))} onChange={onSwich} checkedChildren="ใช้ไฟฟ้า" unCheckedChildren="ไม่ใช้ไฟฟ้า" />
+                            <Switch checked={service.isCheck} onClick={() => {
+                                const isCheck = !service.isCheck
+                                setService(prev => ({ ...prev, isCheck }))
+                                dispatch(setServiceStore({ status: isCheck, price: isCheck ? service.price : 0 }))
+                            }} checkedChildren="ใช้ไฟฟ้า" unCheckedChildren="ไม่ใช้ไฟฟ้า" />
                         </div>
                         <div className="">
                             <div className='mb-3'>
@@ -228,9 +233,9 @@ function Appliance() {
                                 <p className='text-secondary mb-0'>เพิ่มอุปกรณที่ตลาดมีให้ เช่น หลอดไฟ โต๊ะ ร่ม เป็นต้นอาจมีค่าบริการอุปกรณ์เสริมเพิ่มเติม</p>
                             </div>
                             <div className="mb-3">
-                                <ButtonAnt onClick={showModal}>
+                                <AntBtn onClick={showModal}>
                                     เพิ่ม/ลด อุปกรณ์
-                                </ButtonAnt>
+                                </AntBtn>
                             </div>
                             <div className="box-scroll-card">
                                 <div className="box-card">

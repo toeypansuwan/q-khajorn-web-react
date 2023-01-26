@@ -1,5 +1,5 @@
 import React, { lazy, useState, useEffect } from 'react'
-import { Select } from 'antd';
+import { Select, Alert } from 'antd';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom'
 import ImageMapSection from '../../components/ImageMapSection/ImageMapSection';
@@ -92,8 +92,9 @@ function ZonePage() {
                     onChange={handleChange}
                     options={selectData}
                 />
+                <Alert className='mt-3' message="คุณสามารถกดเลือกโซนบนผังตลาดได้" type="info" closable />
             </div>
-            <ImageMapSection plan={plan.image} mapArea={zoneData} onClick={onChangePage} className="h-85vh" />
+            <ImageMapSection plan={plan.image} mapArea={zoneData} type="zone" onClick={onChangePage} className="h-85vh" />
 
         </div >
     )

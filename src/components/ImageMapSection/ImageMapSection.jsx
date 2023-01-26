@@ -6,6 +6,9 @@ import { v4 } from 'uuid';
 import './ImageMapSection.css'
 import moment from 'moment/moment';
 import { useSelector } from 'react-redux';
+import { useGesture } from 'react-use-gesture';
+import { Alert } from 'antd'
+
 const getCenterPoint = (shape, coords) => {
     if (shape === 'circle') {
         const [x, y, r] = coords;
@@ -29,9 +32,12 @@ const getCenterPoint = (shape, coords) => {
         return { x, y };
     }
 };
+
 function ImageMapSection(props) {
     const { reserveStore } = useSelector(state => ({ ...state }))
     const [zoom, setZoom] = useState(1);
+    const [initialDistance, setInitialDistance] = useState(0);
+    const [crop, setCrop] = useState({ x: 0, y: 0, scale: 1, });
     const [areasMap, setAreasMap] = useState([]);
     const componentRef = useRef();
     const [parent, setParent] = useState({});
@@ -41,43 +47,33 @@ function ImageMapSection(props) {
         const py = (y / imgSize.height) * (imgSize.height / imgSize.width * zoom) || 0
         return { x: px, y: py }
     }
-    const handleWheel2 = (event, parent) => {
-        if (event.deltaY > 0) {
-            // Zoom out
-            setZoom(prev => { if (prev <= parent.width) return parent.width; else return prev - 10 });
-        } else {
-            // Zoom in
-            setZoom(prev => { if (prev >= parent.width * 2) return parent.width * 2; else return prev + 10 });
+    useGesture({
+        onDrag: ({ offset: [dx, dy] }) => {
+            setCrop(crop => ({ ...crop, x: dx, y: dy }))
+        },
+        onPinch: ({ offset: [d] }) => {
+            const scale = 1 + d / 100
+            if (scale > 0.5 && scale < 2) {
+                setCrop(crop => ({ ...crop, scale: 1 + d / 100 }))
+            }
         }
-
-    };
+    }, {
+        domTarget: componentRef,
+        eventOptions: { passive: false }
+    })
     useEffect(() => {
         setAreasMap(props.mapArea);
     }, [props.mapArea])
     useEffect(() => {
         setWidthImage();
     }, [props.plan])
-    useEffect(() => {
-        const handleWheel = (event) => {
-            handleWheel2(event, parent)
-        };
-        if (componentRef.current) {
-            componentRef.current.addEventListener('wheel', handleWheel, parent);
-        }
-        return () => {
-
-            if (componentRef.current) {
-                componentRef.current.removeEventListener('wheel', handleWheel);
-            }
-        };
-    }, [zoom]);
-
+    const ref = useRef(null)
     const setWidthImage = () => {
         const img = new Image();
         img.src = props.plan;
         img.onload = (e) => {
             const aspectRatio = e.target.height / e.target.width;
-            const w = componentRef.current.offsetHeight / aspectRatio;
+            const w = ref.current.offsetHeight / aspectRatio;
             const h = aspectRatio * w;
             setZoom(w);
             setParent({ width: w, height: h })
@@ -85,47 +81,62 @@ function ImageMapSection(props) {
         }
     }
     return (
-        <div ref={componentRef} className={`w-100 overflow-scroll position-relative ${props.className}`} >
-            <ImageMapper
-                src={
-                    props.plan
-                }
-                map={
-                    {
-                        name: 'my-map',
-                        areas: areasMap
+        <div className={`overflow-hidden w-100 ${props.className}`} ref={ref}>
+            <div
+                ref={componentRef}
+                style={{
+                    left: crop.x,
+                    top: crop.y,
+                    height: parent.height,
+                    width: parent.width,
+                    touchAction: 'none',
+                    transform: `scale(${crop.scale})`
+                }}
+                className={`position-relative`} >
+                <ImageMapper
+                    src={
+                        props.plan
                     }
-                }
-                responsive={true}
-                zoom={true}
-                parentWidth={zoom}
-                onClick={props.onClick}
-                onLoad={props.onLoad}
-            />
-            {areasMap.map(area => {
-                const center = getCenterPoint(area.shape, area.coords);
-                const centerParent = getParentCenter(center.x, center.y);
-                return (
-                    <span
-                        className='badge text-bg-light'
-                        key={v4()}
-                        style={{
-                            position: 'absolute',
-                            left: centerParent.x,
-                            top: centerParent.y,
-                            transform: 'translate(-50%, -50%)',
-                            zIndex: 999,
-                            pointerEvents: 'none'
-                        }}
-                    >
-                        {reserveStore.data.some(i =>
-                            i.id === area.id && i.days.some(d => d === moment(area.day).format("YYYY-MM-DD"))
-                        ) && props.type === 'section' ? (<Icon icon='akar-icons:circle-check' className='fs-5 text-success' />) : area.title}
-                    </span>
-                );
-            })}
+                    map={
+                        {
+                            name: 'my-map',
+                            areas: areasMap
+                        }
+                    }
+                    // width={parent.width}
+                    // height={parent.height}
+                    responsive={true}
+                    zoom={true}
+                    parentWidth={zoom}
+                    onClick={props.onClick}
+                    onLoad={props.onLoad}
+                />
+                {zoom}
+                {areasMap.map(area => {
+                    const center = getCenterPoint(area.shape, area.coords);
+                    const centerParent = getParentCenter(center.x, center.y);
+                    return (
+                        <span
+                            className='badge text-bg-light'
+                            key={v4()}
+                            style={{
+                                position: 'absolute',
+                                left: centerParent.x,
+                                top: centerParent.y,
+                                transform: 'translate(-50%, -50%)',
+                                zIndex: 999,
+                                pointerEvents: 'none'
+                            }}
+                        >
+                            {reserveStore.data.some(i =>
+                                i.id === area.id && i.days.some(d => d === moment(area.day).format("YYYY-MM-DD"))
+                            ) && props.type === 'section' ? (<Icon icon='akar-icons:circle-check' className='fs-5 text-success' />) : (props.type == "zone" ? `โซน ${area.title}` : area.title)}
+                        </span>
+                    );
+                })}
+            </div>
         </div>
     )
 }
 
-export default ImageMapSection
+export default ImageMapSection;

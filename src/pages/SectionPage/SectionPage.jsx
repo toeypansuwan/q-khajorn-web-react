@@ -1,17 +1,18 @@
 import axios from 'axios';
 import React, { useState, useEffect, useRef, lazy } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+import { LinkContainer } from 'react-router-bootstrap'
 import ImageMapSection from '../../components/ImageMapSection/ImageMapSection';
 import moment from 'moment';
 import th from 'moment/dist/locale/th';
 import { getDays, getLengthDayOfMonth, getMarkerDate, getSection, BASE_URL_API } from '../../services/services'
-import { Tabs } from 'antd';
+import { Tabs, Alert } from 'antd';
 import { Container, Button } from 'react-bootstrap'
 import { v4 as uuidv4 } from 'uuid';
 import { Icon } from '@iconify/react'
 import SiteFixBottom from '../../components/SiteFixBottom/SiteFixBottom';
 // const SiteFixBottom = lazy(() => import('../../components/SiteFixBottom/SiteFixBottom'))
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setIdZone } from '../../reducers/reserveSlice';
 import './SectionPage.css'
 moment.locale('th', th);
@@ -22,6 +23,7 @@ function SectionPage() {
     const dataFetchedRef = useRef(false);
     const [dataTopUp, setDataTopUp] = useState({});
     const dispatch = useDispatch()
+    const reserveStore = useSelector(state => ({ ...state.reserveStore }))
     const [data, setData] = useState([{
         id: 1,
         title: "a1",
@@ -115,25 +117,32 @@ function SectionPage() {
                     <h3 className='text-center'>เลือกแผง</h3>
                 </div>
             </Container>
-            <Tabs
-                defaultActiveKey="1"
-                tabPosition='top'
-                style={{
-                    height: `100%`,
-                    background: '#F1F5FA',
-                }}
-                destroyInactiveTabPane
-                onChange={onChangeTab}
-                items={itemsTab}
-            >
-                {itemsTab.sort((a, b) => new Date(a.key) - new Date(b.key)).map((tab) => (
-                    <Tabs.TabPane tab={tab.title} key={tab.key}>
-                        {tab.children}
-                    </Tabs.TabPane>
-                ))}
-            </Tabs>
+            <div className="position-relative">
+                <Tabs
+                    defaultActiveKey="1"
+                    tabPosition='top'
+                    style={{
+                        height: `100%`,
+                        background: '#F1F5FA',
+                    }}
+                    destroyInactiveTabPane
+                    onChange={onChangeTab}
+                    items={itemsTab}
+                >
+                    {itemsTab.sort((a, b) => new Date(a.key) - new Date(b.key)).map((tab) => (
+                        <Tabs.TabPane tab={tab.title} key={tab.key}>
+                            {tab.children}
+                        </Tabs.TabPane>
+                    ))}
+                </Tabs>
+                <div style={{ top: 80 }} className=" position-absolute start-0 w-100 p-3">
+                    <Alert className='' style={{ zIndex: 9999 }} message="คุณสามารถลากนิ้วเพื่อย่อขยายได้" type="info" closable />
+                </div>
+            </div>
             <SiteFixBottom dataTopUp={dataTopUp} getMarkerDate={getMarkerDate} openTopup={topup} onCloseTopUp={closeTopUp} >
-                <Button slot='buttonNext' as={Link} to={`/profile-market/${id}/section/appliance`} className='w-100'>ทำการจอง</Button>
+                <LinkContainer slot='buttonNext' to={`/profile-market/${id}/section/appliance`}>
+                    <Button className={`w-100 `} disabled={reserveStore.data.length < 1}>ทำการจอง</Button>
+                </LinkContainer>
             </SiteFixBottom>
         </ >
     )

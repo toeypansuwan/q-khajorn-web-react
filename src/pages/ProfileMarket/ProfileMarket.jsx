@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Button } from 'react-bootstrap'
+import { Button, Container } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper";
@@ -107,14 +107,19 @@ function ProfileMarket() {
                         <div className="content" dangerouslySetInnerHTML={{ __html: profileData.detail }}>
 
                         </div>
-                        <div className="row">
-                            <div className="col">
-                                <Button variant="outline-primary" className='w-100' onClick={handleBack}>ย้อนกลับ</Button>
-                            </div>
-                            <div className="col">
-                                <Link to={`/profile-market/${id}/zone`}><Button variant="primary" className='w-100'>ดูผังตลาด</Button></Link>
-                            </div>
+                        <div className="position-fixed bottom-0 bg-white shadow-lg start-0 w-100">
+                            <Container className='py-3'>
+                                <div className="row ">
+                                    <div className="col-4">
+                                        <Button variant="outline-primary" className='w-100' onClick={handleBack}>ย้อนกลับ</Button>
+                                    </div>
+                                    <div className="col-8">
+                                        <Link to={`/profile-market/${id}/zone`}><Button variant="primary" className='w-100'>ดูผังตลาดเพื่อเลือกจอง</Button></Link>
+                                    </div>
+                                </div>
+                            </Container>
                         </div>
+
 
                     </div>
                 </div>

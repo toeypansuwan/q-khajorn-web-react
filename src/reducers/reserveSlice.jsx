@@ -4,7 +4,10 @@ const initialState = {
     id_zone: '',
     data: [],
     services: {
-        service: 0,
+        service: {
+            status: false,
+            price: 0,
+        },
         appliances: []
     }
 }
@@ -48,11 +51,11 @@ const reserveSlice = createSlice({
         setIdZone: (state, action) => {
             state.id_zone = action.payload
         },
-        setIdZone: (state, action) => {
-            state.id_zone = action.payload
-        },
         setService: (state, action) => {
-            state.services.service = action.payload.price
+            state.services.service = {
+                status: action.payload.status,
+                price: action.payload.price
+            }
         },
         addAppliances: (state, action) => {
             const data = action.payload

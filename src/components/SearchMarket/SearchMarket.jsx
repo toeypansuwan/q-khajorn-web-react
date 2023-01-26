@@ -18,7 +18,7 @@ moment.locale('th', th);
 
 function SearchMarket(props) {
   const store = useSelector((state) => ({ ...state }))
-
+  const dispatch = useDispatch();
   const mapKey = import.meta.env.VITE_LONGDOMAP_API_KEY;
   const baseUrl = import.meta.env.VITE_BASE_URL_API;
 
@@ -26,15 +26,14 @@ function SearchMarket(props) {
   const [height, setHeight] = useState(500);
 
   const [childrenDrawer, setChildrenDrawer] = useState(false);
+  const move = useRef("");
   const [suggestLocation, setSuggestLocation] = useState([]);
   const [keywordSearch, setKeywordSearch] = useState('');
   const [currentLocation, setCurrentLocation] = useState(false);
   const [zoomMap, setZoomMap] = useState(15);
-  const [profile, setProfile] = useState({});
   const [location, setLocation] = useState({});
   const searchMarket = useRef(null);
   const [listData, setListData] = useState({ data: [], load: false });
-  const dispatch = useDispatch();
 
   const style = {
     topBorderSiteMenu: {
@@ -57,7 +56,7 @@ function SearchMarket(props) {
     map.Search.language('th');
     map.Event.bind('drag', dragMap);
     map.Event.bind('drop', dropMap);
-    map.Event.bind('location', locationUpdate);
+    // map.Event.bind('location', locationUpdate);
     map.Event.bind('click', clickMap);
     map.zoom(zoomMap)
     // for (const marker of data) {
@@ -81,14 +80,24 @@ function SearchMarket(props) {
     setCurrentLocation(true);
     setOpen(true);
   }
-  const liffFetch = async () => {
-    await liff.ready;
-    const profile = await liff.getProfile();
-    setProfile(profile)
+  const dragMap = () => {
+    setCurrentLocation(false);
+    setSuggestLocation([]);
+    move.current = "drag"
+  }
+  const dropMap = () => {
+    setLocation(map.location())
+    move.current = "drop"
   }
   useEffect(() => {
-    liffFetch().catch(console.error);
-  }, [])
+    if (move.current === "drop") {
+      const currentLocation = map.location();
+
+    }
+  }, [move.current])
+  useEffect(() => {
+    searchListMarket();
+  }, [location])
   const onChildrenDrawerClose = () => {
     setChildrenDrawer(false);
   };
@@ -105,31 +114,7 @@ function SearchMarket(props) {
     setOpen(false);
   };
 
-  const listMarket = () => {
-    const lists = listData.data.map((item) => {
-      return (
-        <div key={uuidv4()}>
-          <Link to={`/profile-market/${item.id}`} className=" text-decoration-none">
-            <Card className='flex-row text-start disable '>
-              <div className="box-image">
-                <Card.Img variant="start" src={`${baseUrl}upload/market/${item.image}`} className='image-fit' />
-              </div>
-              <Card.Body>
-                <Card.Title className='h6'>{item.name}</Card.Title>
-                <Card.Text className='fs-6'>
-                  {moment(item.time_open, 'th').format('LT')} น.<br />
-                  {moment(item.time_close, 'th').format('LT')} น.
-                </Card.Text>
-                {/* <Card.Text className='fs-6'>{profile.displayName}</Card.Text> */}
-                {/* <Button variant='outline-secondary' onClick={() => { liff.logout(); window.location.reload() }}>log</Button> */}
-              </Card.Body>
-            </Card>
-          </Link>
-        </div>
-      )
-    })
-    return lists;
-  }
+
 
   const doSearch = () => {
     axios(`https://search.longdo.com/mapsearch/json/search?keyword=${keywordSearch}&limit=1&key=${mapKey}`).then((res) => {
@@ -161,23 +146,6 @@ function SearchMarket(props) {
     setKeywordSearch(item);
     doSearch();
   }
-  const listSuggestElem = suggestLocation.map((prevLocatin, i) => {
-    return (
-      <li key={i} className="list-group-item list-group-item-action" onClick={() => onClickListKeyword(prevLocatin.w)} aria-current="true">{prevLocatin.w}</li>
-    )
-  });
-  const dragMap = () => {
-    setCurrentLocation(false);
-    setSuggestLocation([]);
-  }
-  const dropMap = () => {
-    setLocation(map.location())
-  }
-  useEffect(() => {
-    searchListMarket();
-  }, [location])
-  const locationUpdate = () => {
-  }
   const clickMap = () => {
     setSuggestLocation([]);
   }
@@ -197,6 +165,7 @@ function SearchMarket(props) {
   }
   const searchListMarket = () => {
     const data = { ...store.filterMarketStore.data, search: searchMarket.current?.value }
+    console.log(data)
     axios.post(`${baseUrl}market/list-filter`, data).then(res => {
       setListData({ data: res.data, load: true });
     }).catch(err => console.error(err.response.data.message.message))
@@ -205,10 +174,14 @@ function SearchMarket(props) {
   return (
     <div className='h-screen'>
       <div className="position-fixed top-0 w-100 start-50 translate-middle-x p-4" style={{ zIndex: 10 }}>
-        <ul className="list-group mt-2 list-style-none shadow-sm">
-          <Input value={keywordSearch} size="large" onKeyUp={onPressEnter} onChange={onChangeSearch} className='list-group-item d-inline-flex' placeholder="สถานที่" allowClear prefix={<Icon icon="akar-icons:location" className='text-secondary fs-3' />} />
-          {listSuggestElem}
-        </ul>
+        {/* <ul className="list-group mt-2 list-style-none shadow-sm">
+          <Input value={keywordSearch} size="large" onKeyUp={onPressEnter} onChange={onChangeSearch} className='list-group-item d-inline-flex' placeholder="สถานที่ใกล้เคียง หรือ ที่คุณต้องการ" allowClear prefix={<Icon icon="akar-icons:location" className='text-secondary fs-3' />} />
+          {
+            suggestLocation.map((prevLocatin, i) => (
+              <li key={i} className="list-group-item list-group-item-action" onClick={() => onClickListKeyword(prevLocatin.w)} aria-current="true">{prevLocatin.w}</li>
+            ))
+          }
+        </ul> */}
       </div>
       <div className="d-grid position-fixed top-50 end-0 translate-middle-y me-3 gap-3 " style={{ zIndex: 10 }}>
         <div className={`map__btn ${currentLocation ? 'active' : ''}`}><Icon icon="bx:current-location" className='fs-4' onClick={getLocation} /></div>
@@ -232,7 +205,7 @@ function SearchMarket(props) {
           </div>
         </div>
         <InputGroup className="mb-3">
-          <Form.Control placeholder='ชื่อตลาด...' ref={searchMarket} />
+          <Form.Control placeholder='ค้นชื่อตลาด...' ref={searchMarket} />
           <Button variant="outline-secondary" className='p-1' onClick={showChildrenDrawer}>
             <Icon icon="clarity:filter-grid-line" className='fs-2' />
           </Button>
@@ -243,7 +216,28 @@ function SearchMarket(props) {
         <div className="position-absolute bottom-0 start-0 overflow-scroll w-100 text-center" style={{ height: 390 }}>
           <Container>
             <div className="d-grid gap-3">
-              {listData.load ? listMarket() : <div></div>}
+              {listData.load ?
+                listData.data.map((item) => {
+                  return (
+                    <div key={uuidv4()}>
+                      <Link to={`/profile-market/${item.id}`} className=" text-decoration-none">
+                        <Card className='flex-row text-start disable '>
+                          <div className="box-image">
+                            <Card.Img variant="start" src={`${baseUrl}upload/market/${item.image}`} className='image-fit' />
+                          </div>
+                          <Card.Body>
+                            <Card.Title className='h6'>{item.name}</Card.Title>
+                            <Card.Text className='fs-6'>
+                              {moment(item.time_open, 'th').format('LT')} - {moment(item.time_close, 'th').format('LT')} น.
+                            </Card.Text>
+                            {/* <Card.Text className='fs-6'>{profile.displayName}</Card.Text> */}
+                            {/* <Button variant='outline-secondary' onClick={() => { liff.logout(); window.location.reload() }}>log</Button> */}
+                          </Card.Body>
+                        </Card>
+                      </Link>
+                    </div>
+                  )
+                }) : null}
             </div>
           </Container>
         </div>
