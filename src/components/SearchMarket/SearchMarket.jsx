@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux';
 import * as moment from 'moment';
 import th from 'moment/dist/locale/th';
 import { useDispatch } from 'react-redux';
+import { addFilter } from '../../reducers/filterMarketSlice';
 moment.locale('th', th);
 
 function SearchMarket(props) {
@@ -87,12 +88,12 @@ function SearchMarket(props) {
   }
   const dropMap = () => {
     setLocation(map.location())
+    dispatch(addFilter(map.location()))
     move.current = "drop"
   }
   useEffect(() => {
     if (move.current === "drop") {
-      const currentLocation = map.location();
-
+      searchListMarket()
     }
   }, [move.current])
   useEffect(() => {
@@ -151,9 +152,16 @@ function SearchMarket(props) {
   }
   const getLocation = async (e) => {
     map.location(longdo.LocationMode.Geolocation)
-    props.getGeoLocation();
-    setCurrentLocation(true);
-    searchListMarket();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const location = { lat: position.coords.latitude, lon: position.coords.longitude }
+        dispatch(addFilter(location))
+        setCurrentLocation(true);
+        searchListMarket();
+      });
+    } else {
+      console.log("Geolocation is not supported by this browser.");
+    }
   }
   const zoomInMap = () => {
     if (zoomMap < 20) setZoomMap(zoomMap + 1);
@@ -165,7 +173,6 @@ function SearchMarket(props) {
   }
   const searchListMarket = () => {
     const data = { ...store.filterMarketStore.data, search: searchMarket.current?.value }
-    console.log(data)
     axios.post(`${baseUrl}market/list-filter`, data).then(res => {
       setListData({ data: res.data, load: true });
     }).catch(err => console.error(err.response.data.message.message))
@@ -209,8 +216,8 @@ function SearchMarket(props) {
           <Button variant="outline-secondary" className='p-1' onClick={showChildrenDrawer}>
             <Icon icon="clarity:filter-grid-line" className='fs-2' />
           </Button>
-          <Button variant="primary" onClick={searchListMarket} >
-            <Icon icon="akar-icons:search" />
+          <Button variant="secondary" onClick={searchListMarket} >
+            <Icon icon="akar-icons:search" color='white' />
           </Button>
         </InputGroup>
         <div className="position-absolute bottom-0 start-0 overflow-scroll w-100 text-center" style={{ height: 390 }}>

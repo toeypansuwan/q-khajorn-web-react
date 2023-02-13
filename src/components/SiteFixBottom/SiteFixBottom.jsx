@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addReserve, editReserve, removeReserve } from '../../reducers/reserveSlice';
-import { Container, Row, Col, Button } from 'react-bootstrap'
+import { Card, Container, Row, Col, Button, ListGroup, Stack } from 'react-bootstrap'
 import PropTypes from 'prop-types';
 import { Image, Drawer, Space } from 'antd';
 import { Icon } from '@iconify/react'
@@ -43,6 +43,7 @@ function SiteFixBottom({
                 id: dataTopUp.id,
                 title: dataTopUp.title,
                 price: dataTopUp.price,
+                image: dataTopUp.image,
                 days: [
                     dataTopUp.day
                 ]
@@ -54,7 +55,7 @@ function SiteFixBottom({
     const [open, setOpen] = useState(false);
     useEffect(() => {
         const fetchMarketData = async () => {
-            if (reserveStore.id_zone) {
+            if (reserveStore.id_zone != null) {
                 const data = await getMarkerDate({ id_zone: reserveStore.id_zone })
                 setMarkerDate(data);
             }
@@ -84,14 +85,15 @@ function SiteFixBottom({
     const handleSelectRange = (range) => {
         const sortRange = range.sort((a, b) => a - b)
         const selectDays = dateFree.current.filter(i => moment(i.day) >= sortRange[0] && moment(i.day) <= sortRange[1])
-        console.log(dateSelect.current, selectDays)
         dateSelect.current = selectDays;
     }
     const onClickOk = () => {
+        // console.log(data, "sss")
         if (!selectedStore && data.days.length > 0) {
             dispatch(addReserve({
                 id: data.id,
                 title: data.title,
+                image: data.image,
                 price: data.price,
                 days: data.days.map(i => moment(i).format('YYYY-MM-DD').toString())
             }))
@@ -102,12 +104,13 @@ function SiteFixBottom({
             id: data.id,
             title: data.title,
             price: data.price,
+            image: data.image,
             days: [...data.days, moment(dataTopUp.day).format('YYYY-MM-DD').toString()]
         }))
         onCloseTopUp();
     }
     const tileContent = ({ date, view }) => {
-        if (moment(date).isAfter(moment().endOf('month'))) {
+        if (moment(date).isAfter(moment().endOf('month').add(1, 'month'))) {
             return null;
         }
         const index = binarySearch(setMarkerId.current, moment(date).format('YYYY-MM-DD'), 'day')
@@ -141,8 +144,11 @@ function SiteFixBottom({
         dispatch(editReserve(dataNew))
         onCloseTopUp()
     }
+    const removeStore = (id) => {
+        dispatch(removeReserve(id))
+    }
     return (
-        <div className={`position-fixed start-0 bottom-0 left w-100 bg-white shadow-custom ${isShowCart ? 'position-fixed start-0 bottom-0' : 'position-relative'}`} style={{ zIndex: 10 }}>
+        <div className={`position-fixed start-0 bottom-0 w-100 bg-white shadow-custom ${isShowCart ? 'position-fixed start-0 bottom-0' : 'position-relative'}`} style={{ zIndex: 10 }}>
             <Container className='py-3'>
                 <Row className=' align-items-center' >
                     <Col xs={'auto'}><h5>แผงที่เลือกไว้</h5></Col>
@@ -153,15 +159,46 @@ function SiteFixBottom({
                         </div>
                     </Col>
                 </Row>
-                <div className="collapse py-3" id="listCart">
-                    {reserveStore.data?.map((item) => {
-                        return (
-                            <div className="card card-body" key={uuisv4()}>
-                                แผงที่ {item.title}<br />
-                                {item.price} บาท *{item.days.length}
-                            </div>
-                        )
-                    })}
+                <div className="collapse py-3 overflow-scroll" id="listCart">
+                    <Stack gap={3}>
+                        {reserveStore.data?.map((item) => {
+                            return (
+                                <Card key={item.id}>
+                                    <Card.Body className="bg-white">
+                                        <Row className='align-items-center'>
+                                            <Col xs={4}>
+                                                <div className="box_image">
+                                                    <Image className='rounded' rootClassName='h-100' fallback={fallbackImg} width={'100%'} src={item.image} />
+                                                </div>
+                                            </Col>
+                                            <Col>
+                                                <h3>แผงที่ {item.title}</h3>
+                                                <h5><strong>{item.price}</strong><small> บาท *{item.days.length}</small></h5>
+                                            </Col>
+                                            <Col xs={'auto'}>
+                                                <Icon onClick={() => { removeStore(item.id) }} icon='ic:baseline-delete-outline' className='fs-1 text-secondary' />
+                                            </Col>
+                                        </Row>
+                                    </Card.Body>
+                                    <ListGroup className="list-group-flush">
+                                        <ListGroup.Item>
+                                            <Row>
+                                                <Col>
+                                                    <div className="d-flex gap-2 align-items-center flex-wrap">
+                                                        <span>วันจอง</span>
+                                                        {item.days.map(date => (<span key={uuisv4()} className=' rounded border px-2'>{moment(date).format('D MMM')}</span>))}
+                                                    </div>
+                                                </Col>
+                                                {/* <Col xs={'auto'}>
+                                                <Icon icon='uil:calender' className='fs-3' onClick={() => { setOpen(true) }} />
+                                            </Col> */}
+                                            </Row>
+                                        </ListGroup.Item>
+                                    </ListGroup>
+                                </Card>
+                            )
+                        })}
+                    </Stack>
                 </div>
                 <hr />
                 <Row className=' align-items-center mb-3'>
@@ -169,7 +206,7 @@ function SiteFixBottom({
                         <p className='h5'>ราคาค่าแผงทั้งหมด : </p>
                     </Col>
                     <Col className='text-end'>
-                        <h3>{
+                        <h3 className='text-secondary'>{
                             reserveStore.data.reduce((total, cur) => {
                                 const days = cur.days.length;
                                 const appliPrice = reserveStore.services.appliances.reduce((totalAppli, curAppli) => totalAppli + curAppli.price * curAppli.amount, 0) * days
@@ -200,7 +237,7 @@ function SiteFixBottom({
                                     : <Icon icon='akar-icons:circle-check' className='fs-1 text-success' onClick={onClickOk} />}
                             </Col> : null}
                             <Col xs={'auto'}>
-                                <Icon onClick={onCloseTopUp} icon='ion:close' className='fs-1 text-secondary' />
+                                <Icon onClick={onCloseTopUp} icon='ion:close' className='fs-1 text-black-50' />
                             </Col>
                         </Row>
                         {
@@ -212,14 +249,14 @@ function SiteFixBottom({
                                             <Col>
                                                 <div className="d-flex gap-2 align-items-center flex-wrap">
                                                     <span>วันจอง</span>
-                                                    {data.days.map(item => (<span key={uuisv4()} className=' rounded border px-2'>{moment(item).format('D MMM')}</span>))
+                                                    {data.days.map(item => (<span key={uuisv4()} className=' rounded border-primary border px-2'>{moment(item).format('D MMM')}</span>))
                                                         // : (<span className=' rounded border px-2'>{moment(dataTopUp.day).format('D MMM')}</span>)}
                                                         // : <span className='px-2 text-secondary'>ไม่มี</span>
                                                     }
                                                 </div>
                                             </Col>
                                             <Col xs={'auto'}>
-                                                <Icon icon='uil:calender' className='fs-3' onClick={() => { setOpen(true) }} />
+                                                <Icon icon='uil:calender' className='fs-3 text-secondary' onClick={() => { setOpen(true) }} />
                                             </Col>
                                         </Row>
                                     </>
@@ -239,7 +276,7 @@ function SiteFixBottom({
                         extra={
                             <Space>
                                 <Button variant='outline-secondary' onClick={onClose}>ยกเลิก</Button>
-                                <Button type="primary" onClick={onOk}>
+                                <Button variant="secondary" onClick={onOk}>
                                     ตกลง
                                 </Button>
                             </Space>
@@ -254,15 +291,15 @@ function SiteFixBottom({
                             }
                         />
                         <div className="d-flex gap-3 justify-content-center mt-3">
-                            <span className='text-secondary before_status before_success'>
+                            <span className='text-muted before_status before_success'>
                                 แผงว่าง
                             </span>
-                            <span className='text-secondary before_status before_danger'>
+                            <span className='text-muted before_status before_danger'>
                                 แผงไม่ว่าง
                             </span>
                         </div>
                     </Drawer>
-                </div> : <></>}
+                </div> : null}
         </div>
     )
 }

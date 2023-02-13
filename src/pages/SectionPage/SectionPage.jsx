@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState, useEffect, useRef, lazy } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { LinkContainer } from 'react-router-bootstrap'
 import ImageMapSection from '../../components/ImageMapSection/ImageMapSection';
@@ -15,6 +15,7 @@ import SiteFixBottom from '../../components/SiteFixBottom/SiteFixBottom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIdZone } from '../../reducers/reserveSlice';
 import './SectionPage.css'
+import CustomConfigProvider from '../../Config/CustomConfigProvider';
 moment.locale('th', th);
 
 function SectionPage() {
@@ -24,13 +25,12 @@ function SectionPage() {
     const [dataTopUp, setDataTopUp] = useState({});
     const dispatch = useDispatch()
     const reserveStore = useSelector(state => ({ ...state.reserveStore }))
-    const [data, setData] = useState([{
-        id: 1,
-        title: "a1",
-        days: [],
-    }])
+    // const [data, setData] = useState([{
+    //     id: 1,
+    //     title: "a1",
+    //     days: [],
+    // }])
     const [topup, setTopup] = useState(false);
-    const [daySelect, setDaySelect] = useState("");
     const getImagePlan = async () => {
         try {
             const res = await axios.get(`${BASE_URL_API}market/${id}/image-plan-zone`)
@@ -51,9 +51,9 @@ function SectionPage() {
         dataFetchedRef.current = true;
         configTaps();
     }, [])
-    useEffect(() => {
-        // console.log("new", data);
-    }, [data])
+    // useEffect(() => {
+    //     // console.log("new", data);
+    // }, [data])
 
     const configTaps = async () => {
         const days = await getDays(id);
@@ -70,7 +70,7 @@ function SectionPage() {
                             {
                                 label: <DaysList days={day} />,
                                 key: day,
-                                children: <ImageMapSection type="section" plan={plan} mapArea={mapArea} className="h-70" onClick={onClickSection} onLoad={(s, e) => { console.log(e) }} />,
+                                children: <ImageMapSection type="section" plan={plan} mapArea={mapArea} className="h-70" onClick={onClickSection} onLoad={(s, e) => { }} />,
                             },
                         ]
                     })
@@ -85,8 +85,9 @@ function SectionPage() {
     const DaysList = (props) => {
         return (
             <div className="text-center">
-                <span className='text-secondary'>{moment(props.days).format('dd')}</span>
+                <span className='text-muted'>{moment(props.days).format('dd')}</span>
                 <p className='h4 mb-0'>{moment(props.days).format('D')}</p>
+                <span className='text-muted'>{moment(props.days).format('MMM')}</span>
                 {/* <span className='text-secondary'>{moment(props.days).format('MMM')}</span> */}
             </div>
         )
@@ -107,7 +108,6 @@ function SectionPage() {
     }
     const onChangeTab = (e) => {
         closeTopUp();
-        setDaySelect(e);
     }
     return (
         <>
@@ -118,25 +118,27 @@ function SectionPage() {
                 </div>
             </Container>
             <div className="position-relative">
-                <Tabs
-                    defaultActiveKey="1"
-                    tabPosition='top'
-                    style={{
-                        height: `100%`,
-                        background: '#F1F5FA',
-                    }}
-                    destroyInactiveTabPane
-                    onChange={onChangeTab}
-                    items={itemsTab}
-                >
-                    {itemsTab.sort((a, b) => new Date(a.key) - new Date(b.key)).map((tab) => (
-                        <Tabs.TabPane tab={tab.title} key={tab.key}>
-                            {tab.children}
-                        </Tabs.TabPane>
-                    ))}
-                </Tabs>
+                <CustomConfigProvider>
+                    <Tabs
+                        defaultActiveKey="1"
+                        tabPosition='top'
+                        style={{
+                            height: `100%`,
+                            background: '#F1F5FA',
+                        }}
+                        destroyInactiveTabPane
+                        onChange={onChangeTab}
+                        items={itemsTab}
+                    >
+                        {itemsTab.sort((a, b) => new Date(a.key) - new Date(b.key)).map((tab) => (
+                            <Tabs.TabPane tab={tab.title} key={tab.key}>
+                                {tab.children}
+                            </Tabs.TabPane>
+                        ))}
+                    </Tabs>
+                </CustomConfigProvider>
                 <div style={{ top: 80 }} className=" position-absolute start-0 w-100 p-3">
-                    <Alert className='' style={{ zIndex: 9999 }} message="คุณสามารถลากนิ้วเพื่อย่อขยายได้" type="info" closable />
+                    <Alert message="คุณสามารถลากนิ้วเพื่อย่อขยายได้" type="info" closable />
                 </div>
             </div>
             <SiteFixBottom dataTopUp={dataTopUp} getMarkerDate={getMarkerDate} openTopup={topup} onCloseTopUp={closeTopUp} >

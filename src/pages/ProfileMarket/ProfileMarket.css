@@ -13,6 +13,40 @@
     color: #717171;
 }
 
-/* .detail__market .content h1 {
-    margin-bottom: 0.5rem;
-} */
+.detail__market .content {
+    margin-bottom: 70px;
+}
+
+.detail__market .content h1 {
+    font-size: 36px;
+}
+
+.detail__market .content h2 {
+    font-size: 24px;
+}
+
+.detail__market .content h3 {
+    font-size: 20px;
+}
+
+.detail__market .content h4 {
+    font-size: 17px;
+}
+
+.detail__market .content h5 {
+    font-size: 15px;
+}
+
+.detail__market .content h6 {
+    font-size: 14px;
+}
+
+.detail__market .content ul li {
+    font-size: 17px;
+    color: #717171;
+}
+
+.detail__market .content p {
+    font-size: 14px;
+    color: #717171;
+}

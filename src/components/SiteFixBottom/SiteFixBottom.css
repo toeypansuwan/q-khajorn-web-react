@@ -6,6 +6,10 @@
     transform: rotate(-180deg)
 }
 
+#listCart {
+    max-height: 400px;
+}
+
 .top-up {
     width: 100%;
     position: absolute;

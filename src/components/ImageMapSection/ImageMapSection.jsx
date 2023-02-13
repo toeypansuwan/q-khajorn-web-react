@@ -8,6 +8,7 @@ import moment from 'moment/moment';
 import { useSelector } from 'react-redux';
 import { useGesture } from 'react-use-gesture';
 import { Alert } from 'antd'
+import { Badge } from 'react-bootstrap';
 
 const getCenterPoint = (shape, coords) => {
     if (shape === 'circle') {
@@ -53,7 +54,7 @@ function ImageMapSection(props) {
         },
         onPinch: ({ offset: [d] }) => {
             const scale = 1 + d / 100
-            if (scale > 0.5 && scale < 2) {
+            if (scale > 0.1 && scale < 2) {
                 setCrop(crop => ({ ...crop, scale: 1 + d / 100 }))
             }
         }
@@ -111,13 +112,12 @@ function ImageMapSection(props) {
                     onClick={props.onClick}
                     onLoad={props.onLoad}
                 />
-                {zoom}
                 {areasMap.map(area => {
                     const center = getCenterPoint(area.shape, area.coords);
                     const centerParent = getParentCenter(center.x, center.y);
                     return (
                         <span
-                            className='badge text-bg-light'
+                            className='d-inline-block fw-bolder h5'
                             key={v4()}
                             style={{
                                 position: 'absolute',
@@ -125,12 +125,12 @@ function ImageMapSection(props) {
                                 top: centerParent.y,
                                 transform: 'translate(-50%, -50%)',
                                 zIndex: 999,
-                                pointerEvents: 'none'
+                                pointerEvents: 'none',
                             }}
                         >
                             {reserveStore.data.some(i =>
                                 i.id === area.id && i.days.some(d => d === moment(area.day).format("YYYY-MM-DD"))
-                            ) && props.type === 'section' ? (<Icon icon='akar-icons:circle-check' className='fs-5 text-success' />) : (props.type == "zone" ? `โซน ${area.title}` : area.title)}
+                            ) && props.type === 'section' ? (<Icon icon='material-symbols:check-circle' className='text-success fs-1' />) : <Badge bg='light' text='dark'>{(props.type == "zone" ? `โซน ${area.title}` : area.title)}</Badge>}
                         </span>
                     );
                 })}

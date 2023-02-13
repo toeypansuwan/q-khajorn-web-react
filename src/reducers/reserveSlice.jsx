@@ -22,14 +22,16 @@ const reserveSlice = createSlice({
                 {
                     id: data.id,
                     title: data.title,
+                    image: data.image,
                     price: data.price,
                     days: data.days,
                 }
             ]
         },
         removeReserve: (state, action) => {
+            console.log(action.payload)
             console.log("remove")
-            state.data = state.data.filter(i => i.id != action.payload.id)
+            state.data = state.data.filter(i => i.id != action.payload)
         },
         editReserve: (state, action) => {
             const data = action.payload
@@ -38,6 +40,7 @@ const reserveSlice = createSlice({
                     return {
                         id: data.id,
                         title: data.title,
+                        image: data.image,
                         price: data.price,
                         days: data.days,
                     }

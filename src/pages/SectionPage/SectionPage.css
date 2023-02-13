@@ -1,5 +1,5 @@
 .h-70 {
-    height: 65vh;
+    height: calc(100vh - 70px);
 }
 
 .bg {

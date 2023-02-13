@@ -90,7 +90,7 @@ function ProfileMarket() {
                         <SwiperSlide className='img-slider'>
                             <img className='' src={`${BASE_URL_API}upload/market/${profileData.image}`} alt="" />
                         </SwiperSlide>
-                        {loadData ? listGalleries : "f"}
+                        {loadData ? listGalleries : null}
                     </Swiper>
 
                     <div className="py-3 container">
@@ -99,9 +99,9 @@ function ProfileMarket() {
                             <div className="col">
                                 <p>เปิด {listDays}<br />เวลา {`${moment(profileData.time_open, 'th').format('LT')} - ${moment(profileData.time_close, 'th').format('LT')} น.`}</p>
                             </div>
-                            <div className="col-3 text-end">
+                            <div className="col-4 text-end">
                                 <p className='mb-0'>ราคาเริ่มต้น</p>
-                                <h6 className='fw-bold text-dark'>{profileData.min} บาท</h6>
+                                <h5 className='fw-bold text-dark'>{profileData.min} บาท</h5>
                             </div>
                         </div>
                         <div className="content" dangerouslySetInnerHTML={{ __html: profileData.detail }}>
@@ -119,8 +119,6 @@ function ProfileMarket() {
                                 </div>
                             </Container>
                         </div>
-
-
                     </div>
                 </div>
             )}

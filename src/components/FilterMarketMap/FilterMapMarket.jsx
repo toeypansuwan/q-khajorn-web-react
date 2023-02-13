@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addFilter } from '../../reducers/filterMarketSlice';
 import axios from 'axios';
 import { useEffect } from 'react';
-
+import CustomConfigProvider from '../../Config/CustomConfigProvider';
 
 function FilterMapMarket(props) {
     const { filterMarketStore } = useSelector((state) => ({ ...state }));
@@ -81,81 +81,83 @@ function FilterMapMarket(props) {
 
 
     return (
-        <Drawer
-            title="คัดกรองตลาด"
-            placement="bottom"
-            contentWrapperStyle={{ ...style.topBorderSiteMenu }}
-            onClose={onChildrenDrawerClose}
-            bodyStyle={{ paddingTop: 8 }}
-            open={props.childrenDrawer}
-            closable={false}
-            extra={
-                <Space>
-                    <Button variant='outline-secondary' onClick={onChildrenDrawerClose}>ยกเลิก</Button>
-                    <Button type="primary" onClick={confirmFilter}>
-                        แก้ไข
-                    </Button>
-                </Space>
-            }
-        >
+        <CustomConfigProvider type='secondary'>
+            <Drawer
+                title="คัดกรองตลาด"
+                placement="bottom"
+                contentWrapperStyle={{ ...style.topBorderSiteMenu }}
+                onClose={onChildrenDrawerClose}
+                bodyStyle={{ paddingTop: 8 }}
+                open={props.childrenDrawer}
+                closable={false}
+                extra={
+                    <Space>
+                        <Button variant='outline-secondary' onClick={onChildrenDrawerClose}>ยกเลิก</Button>
+                        <Button type="primary" onClick={confirmFilter}>
+                            แก้ไข
+                        </Button>
+                    </Space>
+                }
+            >
 
-            {!load ? <div></div> : (
-                <div className="">
-                    <div className="mb-3">
-                        <h6>สถานะ</h6>
-                        <Radio.Group onChange={onChangeRadio} defaultValue={selectValue}>
-                            <Radio.Button value="">ทั้งหมด</Radio.Button>
-                            <Radio.Button value="free">มีที่ว่าง</Radio.Button>
-                            <Radio.Button value="full">ไม่มีที่ว่าง</Radio.Button>
-                        </Radio.Group>
+                {!load ? <div></div> : (
+                    <div className="">
+                        <div className="mb-3">
+                            <h6>สถานะ</h6>
+                            <Radio.Group onChange={onChangeRadio} defaultValue={selectValue}>
+                                <Radio.Button value="">ทั้งหมด</Radio.Button>
+                                <Radio.Button value="free">มีที่ว่าง</Radio.Button>
+                                <Radio.Button value="full">ไม่มีที่ว่าง</Radio.Button>
+                            </Radio.Group>
+                        </div>
+                        <div className="mb-3">
+                            <h6>ค่าเช่าตลาด</h6>
+                            <Slider onChange={onChangeLength} range defaultValue={[inputMinValue, inputMaxValue]} min={defaultPrice.min} max={defaultPrice.max} />
+                            <Row className="justify-content-between">
+                                <Col xs={'auto'} md={3}>
+                                    <InputNumber
+                                        min={defaultPrice.min}
+                                        max={defaultPrice.max}
+                                        value={inputMinValue}
+                                        onChange={onChangeMin}
+                                    />
+                                </Col>
+                                <Col xs={'auto'} md={3}>
+                                    <InputNumber
+                                        min={defaultPrice.min}
+                                        max={defaultPrice.max}
+                                        value={inputMaxValue}
+                                        onChange={onChangeMax}
+                                    />
+                                </Col>
+                            </Row>
+                        </div>
+                        <div className="mb-3">
+                            <h6>ระยะทาง</h6>
+                            <p className='text-muted'>ระยะทางสูงสุด 100 กิโลเมตร</p>
+                            <Row>
+                                <Col>
+                                    <Slider
+                                        min={1}
+                                        max={100}
+                                        onChange={onChangeKg}
+                                        value={typeof inputKgValue === 'number' ? inputKgValue : 0}
+                                    />
+                                </Col>
+                                <Col xs={'auto'}>
+                                    <InputNumber
+                                        min={1}
+                                        max={100}
+                                        value={inputKgValue}
+                                        onChange={onChangeKg}
+                                    />
+                                </Col>
+                            </Row>
+                        </div>
                     </div>
-                    <div className="mb-3">
-                        <h6>ค่าเช่าตลาด</h6>
-                        <Slider onChange={onChangeLength} range defaultValue={[inputMinValue, inputMaxValue]} min={defaultPrice.min} max={defaultPrice.max} />
-                        <Row className="justify-content-between">
-                            <Col xs={'auto'} md={3}>
-                                <InputNumber
-                                    min={defaultPrice.min}
-                                    max={defaultPrice.max}
-                                    value={inputMinValue}
-                                    onChange={onChangeMin}
-                                />
-                            </Col>
-                            <Col xs={'auto'} md={3}>
-                                <InputNumber
-                                    min={defaultPrice.min}
-                                    max={defaultPrice.max}
-                                    value={inputMaxValue}
-                                    onChange={onChangeMax}
-                                />
-                            </Col>
-                        </Row>
-                    </div>
-                    <div className="mb-3">
-                        <h6>ระยะทาง</h6>
-                        <p className='text-secondary'>ระยะทางสูงสุด 100 กิโลเมตร</p>
-                        <Row>
-                            <Col>
-                                <Slider
-                                    min={1}
-                                    max={100}
-                                    onChange={onChangeKg}
-                                    value={typeof inputKgValue === 'number' ? inputKgValue : 0}
-                                />
-                            </Col>
-                            <Col xs={'auto'}>
-                                <InputNumber
-                                    min={1}
-                                    max={100}
-                                    value={inputKgValue}
-                                    onChange={onChangeKg}
-                                />
-                            </Col>
-                        </Row>
-                    </div>
-                </div>
-            )}
-        </Drawer>
+                )}
+            </Drawer>
+        </CustomConfigProvider>
     )
 }
 

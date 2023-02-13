@@ -8,6 +8,7 @@ const ZonePage = lazy(() => import('./pages/ZonePage/ZonePage'));
 const SectionPage = lazy(() => import('./pages/SectionPage/SectionPage'));
 const Appliance = lazy(() => import('./pages/Appliance/Appliance'));
 const LoginPage = lazy(() => import('./pages/Login/LoginPage'));
+const PaymentGatewayPage = lazy(() => import('./pages/PaymentGatewayPage/PaymentGatewayPage'));
 
 function AppRouting() {
   return (
@@ -21,6 +22,7 @@ function AppRouting() {
             <Route path=':id/zone' element={<ZonePage />} />
             <Route path=':id/section' element={<SectionPage />} />
             <Route path=':id/section/appliance' element={<Appliance />} />
+            <Route path='payment' element={<PaymentGatewayPage />} />
           </Route>
           <Route path='/login' element={<LoginPage />} />
         </Routes>

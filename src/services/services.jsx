@@ -48,20 +48,24 @@ const getLengthDayOfMonth = (date = null) => {
     } else {
         currentDay = moment().startOf('day');
     }
-    const endDayOfMonth = moment().endOf('month');
+    const endDayOfMonth = moment().endOf('month').add(1, 'month');
+    // console.log(endDayOfMonth.diff(currentDay, 'days'))
     // console.log("statt", currentDay.format("DD-MM-YYYY"), "end", endDayOfMonth.format("DD-MM-YYYY"))
     // .add(2, 'month')
     return endDayOfMonth.diff(currentDay, 'days');
 }
 const getMarkerDate = async ({ date, id_zone }) => {
     try {
+        if (!id_zone) {
+            return;
+        }
         const days = await getDays(id_zone);
         let data = [];
         for (let index = 0; index < getLengthDayOfMonth(date); index++) {
             const day = new Date(moment(date).add(index, 'days').format('YYYY-MM-DD'))
             const isDay = day.toLocaleDateString('en', { weekday: 'long' });
             if (days.includes(isDay)) {
-                const { mapArea } = await getSection({ d: day, id_zone });
+                const { mapArea } = await getSection({ d: day, id: id_zone });
                 data.push(...mapArea.map(i => ({ id: i.id, status: i.status, day: moment(i.day).format("YYYY-MM-DD"), color: i.preFillColor })))
             }
         }

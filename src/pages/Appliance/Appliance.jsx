@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import SiteFixBottom from '../../components/SiteFixBottom/SiteFixBottom'
-import { Button, Row, Col, Container } from 'react-bootstrap'
+import { Button, Row, Col, Container, Badge } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getMarkerDate, BASE_URL_API } from '../../services/services'
 import { Icon } from '@iconify/react'
@@ -12,6 +12,7 @@ import { setService as setServiceStore, addAppliances, editAppliances, removeApp
 
 import './Appliance.css'
 import liff from '@line/liff'
+import CustomConfigProvider from '../../Config/CustomConfigProvider'
 function Appliance() {
     const { id } = useParams();
     const reserveStore = useSelector(state => ({ ...state.reserveStore }))
@@ -175,43 +176,46 @@ function Appliance() {
     return (
         <>
             {contextHolder}
-            <Modal
-                title="เพิ่ม/ลด อุปกรณ์เสริมต้องการเช่า"
-                open={isModalOpen}
-                onOk={handleOk}
-                onCancel={handleCancel}
-                centered
-                width={1000}
-                // footer={
-                //     <>
-                //         <AntBtn type='primary' onClick={handleOk}>เลือก</AntBtn>
-                //     </>
-                // }
-                footer={false}
-            >
-                <Transfer
-                    className='tranfer-appliances'
-                    dataSource={appliances}
-                    titles={['คลังอุปกรณ์', 'อุปกรณ์ที่เลือก']}
-                    targetKeys={targetKeys}
-                    selectedKeys={selectedKeys}
-                    onChange={onChange}
-                    onSelectChange={onSelectChange}
-                    onScroll={onScroll}
-                    operations={['เพิ่มอุปกรณ์ที่เลือก']}
-                    oneWay
-                    listStyle={{
-                        height: 350,
-                    }}
-                    render={renderListItem}
-                    style={{ justifyContent: 'flex-end' }}
-                />
-            </Modal>
+
+            <CustomConfigProvider type='secondary'>
+                <Modal
+                    title="เพิ่ม/ลด อุปกรณ์เสริมต้องการเช่า"
+                    open={isModalOpen}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    centered
+                    width={1000}
+                    // footer={
+                    //     <>
+                    //         <AntBtn type='primary' onClick={handleOk}>เลือก</AntBtn>
+                    //     </>
+                    // }
+                    footer={false}
+                >
+                    <Transfer
+                        className='tranfer-appliances'
+                        dataSource={appliances}
+                        titles={['คลังอุปกรณ์', 'อุปกรณ์ที่เลือก']}
+                        targetKeys={targetKeys}
+                        selectedKeys={selectedKeys}
+                        onChange={onChange}
+                        onSelectChange={onSelectChange}
+                        onScroll={onScroll}
+                        operations={['เพิ่มอุปกรณ์ที่เลือก']}
+                        oneWay
+                        listStyle={{
+                            height: 350,
+                        }}
+                        render={renderListItem}
+                        style={{ justifyContent: 'flex-end' }}
+                    />
+                </Modal>
+            </CustomConfigProvider>
 
 
-            <Container className='pt-3'>
+            <Container className='pt-3 pb-200'>
                 <div className=" position-relative">
-                    <button onClick={handleBack} className='btn position-absolute start-0 top-50 translate-middle-y'><Icon icon="eva:arrow-ios-back-fill" className='fs-3' /></button>
+                    {/* <button onClick={handleBack} className='btn position-absolute start-0 top-50 translate-middle-y'><Icon icon="eva:arrow-ios-back-fill" className='fs-3' /></button> */}
                     <h4 className='text-center'>เลือกอุปกรณ์เสริม</h4>
                 </div>
                 <div className="py-3">
@@ -219,8 +223,8 @@ function Appliance() {
 
                     <Space direction="vertical" size={30}>
                         <div className="">
-                            <h5>บริการไฟฟ้า</h5>
-                            <p className='text-secondary mb-3'>หากเลือกบริการนี้จะสามารถใช้ไฟฟ้าในแผงตนเองได้ อาจมีค่าบริการไฟฟ้าเพิ่มเติม {service?.price || 0} บาท</p>
+                            <h5>บริการไฟฟ้า  {service.isCheck ? (<Badge bg='success'>ใช้ไฟฟ้า</Badge>) : (<Badge bg='secondary'>ไม่ใช้ไฟฟ้า</Badge>)}</h5>
+                            <p className='text-muted mb-3'>หากเลือกบริการนี้จะสามารถใช้ไฟฟ้าในแผงตนเองได้ อาจมีค่าบริการไฟฟ้าเพิ่มเติม {service?.price || 0} บาท</p>
                             <Switch checked={service.isCheck} onClick={() => {
                                 const isCheck = !service.isCheck
                                 setService(prev => ({ ...prev, isCheck }))
@@ -230,10 +234,10 @@ function Appliance() {
                         <div className="">
                             <div className='mb-3'>
                                 <h5>เพิ่มอุปกรณ์เสริม</h5>
-                                <p className='text-secondary mb-0'>เพิ่มอุปกรณที่ตลาดมีให้ เช่น หลอดไฟ โต๊ะ ร่ม เป็นต้นอาจมีค่าบริการอุปกรณ์เสริมเพิ่มเติม</p>
+                                <p className='text-muted mb-0'>เพิ่มอุปกรณที่ตลาดมีให้ เช่น หลอดไฟ โต๊ะ ร่ม เป็นต้นอาจมีค่าบริการอุปกรณ์เสริมเพิ่มเติม</p>
                             </div>
                             <div className="mb-3">
-                                <AntBtn onClick={showModal}>
+                                <AntBtn type='secondary' onClick={showModal}>
                                     เพิ่ม/ลด อุปกรณ์
                                 </AntBtn>
                             </div>
@@ -250,7 +254,7 @@ function Appliance() {
                                                     className='d-block'
                                                     title={
                                                         <Row className=' justify-content-between'>
-                                                            <Col>{item.name}</Col>
+                                                            <Col><p>{item.name}*{item.amount}</p></Col>
                                                             <Col xs={'auto'}><DeleteOutlined onClick={() => {
                                                                 const data = targetKeys.filter(i => i !== item.id)
                                                                 setTargetKeys(data);
@@ -285,11 +289,11 @@ function Appliance() {
             <SiteFixBottom openTopup={false} getMarkerDate={getMarkerDate}>
                 <Row slot='buttonNext' className='gx-3'>
                     <Col xs='4'>
-                        <Button variant='outline-secondary' onClick={handleBack} className='w-100'>ย้อนกลับ</Button>
+                        <Button variant='outline-primary' onClick={handleBack} className='w-100'>ย้อนกลับ</Button>
                     </Col>
                     <Col xs='8'>
-                        {/* <Button as={Link} to={`/`} className='w-100'>จ่ายค่าแผง</Button> */}
-                        <Button className='w-100' onClick={onClickConfirm}>จ่ายค่าแผง</Button>
+                        <Button as={Link} to={`/profile-market/payment`} className='w-100'>เลือกช่องทางชำระเงิน</Button>
+                        {/* <Button className='w-100' onClick={onClickConfirm}>จ่ายค่าแผง</Button> */}
                     </Col>
                 </Row>
             </SiteFixBottom>
