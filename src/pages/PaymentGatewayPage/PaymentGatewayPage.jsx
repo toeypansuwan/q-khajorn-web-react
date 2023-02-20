@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
+import liff from '@line/liff'
+import { message, Spin } from 'antd';
 
 const PaymentGatewayPage = () => {
     const { reserveStore } = useSelector(state => ({ ...state }));
@@ -16,6 +18,9 @@ const PaymentGatewayPage = () => {
         total_price_service: 0,
         total_price_appliance: 0,
     });
+    const [loading, setLoading] = useState(false);
+    const [messageApi, contextHolder] = message.useMessage();
+    const [profile, setProfile] = useState();
     const haveAppliances = reserveStore.services.appliances.length > 0
 
     const navigate = useNavigate();
@@ -40,8 +45,42 @@ const PaymentGatewayPage = () => {
             total_price_service: reserveStore.services.service.price * total_length_section,
             total_price_appliance,
         }))
-
+        liffFetch();
     }, [])
+    const liffFetch = async () => {
+        await liff.ready
+        const profile = await liff.getProfile()
+        setProfile(profile);
+    }
+
+    const onClickConfirm = () => {
+        setLoading(true);
+        const data = {
+            line_id: profile.userId,
+            market_id: reserveStore.id_market,
+            zone_id: reserveStore.id_zone,
+            service: reserveStore.services.service.status ? 1 : 0,
+            sections: reserveStore.data.map(i => ({
+                id: i.id,
+                days: i.days
+            })),
+            appliances: reserveStore.services.appliances.map(i => ({
+                id: i.id,
+                amount: i.amount
+            }))
+        }
+        // axios.post(`${BASE_URL_API}order/create`, data).then(res => {
+        //     // if (res.data.res_code == 200) liff.closeWindow();
+        //     // navigate('/')
+        // }).catch(err => {
+        //     messageApi.open({
+        //         type: 'error',
+        //         content: err.response.data.message
+        //     })
+        // }).finally(() => {
+        //     setLoading(false)
+        // })
+    }
 
     const calculateTotal = (sections, appliances) => {
         return sections.reduce((total, section) => {
@@ -63,105 +102,108 @@ const PaymentGatewayPage = () => {
         setConfirm(!confirm)
     }
     return (
-        <div className='pb-200'>
-            <Container className='pt-3'>
-                <div className=" position-relative">
-                    {/* <button onClick={handleBack} className='btn position-absolute start-0 top-50 translate-middle-y'><Icon icon="eva:arrow-ios-back-fill" className='fs-3' /></button> */}
-                    <h4 className='text-center'>ช่องทางการชำระเงิน</h4>
-                </div>
-                <Stack direction='horizontal' className='mt-3 justify-content-between'>
-                    <p >ยอดรวมค่าแผง</p>
-                    <p>{`฿ ${totalSection.total_price_section}`}</p>
-                </Stack>
-                <Stack gap={2}>
-                    {reserveStore.data.map((section) => {
-                        const length = Array.from(section.days).length
-                        return (
-                            <Stack className="text-custom-secondary" key={section.id}>
-                                <span>ค่าแผงที่ {section.title}</span>
-                                <Stack direction='horizontal' className='justify-content-between'>
-                                    <span>{section.price}*{length} วัน</span>
-                                    <span>{`฿ ${section.price * length}`}</span>
+        <Spin spinning={loading}>
+            <div className='pb-200'>
+
+                {contextHolder}
+                <Container className='pt-3'>
+                    <div className=" position-relative">
+                        {/* <button onClick={handleBack} className='btn position-absolute start-0 top-50 translate-middle-y'><Icon icon="eva:arrow-ios-back-fill" className='fs-3' /></button> */}
+                        <h4 className='text-center'>ช่องทางการชำระเงิน</h4>
+                    </div>
+                    <Stack direction='horizontal' className='mt-3 justify-content-between'>
+                        <p >ยอดรวมค่าแผง</p>
+                        <p>{`฿ ${totalSection.total_price_section}`}</p>
+                    </Stack>
+                    <Stack gap={2}>
+                        {reserveStore.data.map((section) => {
+                            const length = Array.from(section.days).length
+                            return (
+                                <Stack className="text-custom-secondary" key={section.id}>
+                                    <span>ค่าแผงที่ {section.title}</span>
+                                    <Stack direction='horizontal' className='justify-content-between'>
+                                        <span>{section.price}*{length} วัน</span>
+                                        <span>{`฿ ${section.price * length}`}</span>
+                                    </Stack>
                                 </Stack>
+                            )
+                        })}
+                    </Stack>
+
+                    {reserveStore.services.status || haveAppliances ? (
+                        <>
+                            <hr />
+                            <Stack direction='horizontal' className='mt-3 justify-content-between'>
+                                <p >ยอดรวมค่าอุปกรณ์ {totalSection.total_length_section}วัน</p>
+                                <p>{`฿ ${totalSection.total_price_appliance + totalSection.total_price_service}`}</p>
                             </Stack>
-                        )
-                    })}
-                </Stack>
-
-                {reserveStore.services.status || haveAppliances ? (
-                    <>
-                        <hr />
-                        <Stack direction='horizontal' className='mt-3 justify-content-between'>
-                            <p >ยอดรวมค่าอุปกรณ์ {totalSection.total_length_section}วัน</p>
-                            <p>{`฿ ${totalSection.total_price_appliance + totalSection.total_price_service}`}</p>
-                        </Stack>
-                        <Stack className="text-custom-secondary" gap={2}>
-                            {reserveStore.services.service.status ? (
-                                <Stack direction='horizontal' className='justify-content-between'>
-                                    <span>ค่าบริการไฟฟ้า</span>
-                                    <span>{`฿ ${totalSection.total_price_service}`}</span>
-                                </Stack>
-                            ) : null}
-                            {haveAppliances ? (
-                                reserveStore.services.appliances.map(appliance => {
-                                    return (
-                                        <Stack direction='horizontal' className='justify-content-between'>
-                                            <span>{appliance.name}</span>
-                                            <span>{`฿ ${appliance.price * appliance.amount * totalSection.total_length_section}`}</span>
-                                        </Stack>
-                                    )
-                                })
-                            ) : null}
-                        </Stack>
-                    </>
-                ) : null}
-                <Stack direction='horizontal' className='mt-4 justify-content-between fw-bold'>
-                    <span>ยอดรวม</span>
-                    <span>{`฿ ${totalSection.total_price_appliance + totalSection.total_price_service + totalSection.total_price_section}`}</span>
-                </Stack>
-            </Container>
-            <hr />
-            <Container className='pt-3'>
-                <Card>
-                    <Card.Body>
-                        <Card.Title>
-                            วิธีชำระเงิน
-                        </Card.Title>
-                        <Form>
-                            <FormCheck id='payment1' className='mt-3 ps-0' type='radio'>
-                                <FormCheck.Label className='w-100'>
-                                    <Card className={payment == 'qrcode' ? 'border-secondary' : null}>
-                                        <Card.Body>
-                                            <Stack direction='horizontal' className='align-items-center'>
-                                                <FormCheck.Input name='payment' className='m-1' type='radio' value='qrcode' checked={payment === 'qrcode'} onChange={handleChange} />
-                                                <span className='ms-2 me-auto'>ชำระผ่าน QR Code</span>
-                                                <Icon icon='bi:qr-code' />
+                            <Stack className="text-custom-secondary" gap={2}>
+                                {reserveStore.services.service.status ? (
+                                    <Stack direction='horizontal' className='justify-content-between'>
+                                        <span>ค่าบริการไฟฟ้า</span>
+                                        <span>{`฿ ${totalSection.total_price_service}`}</span>
+                                    </Stack>
+                                ) : null}
+                                {haveAppliances ? (
+                                    reserveStore.services.appliances.map(appliance => {
+                                        return (
+                                            <Stack direction='horizontal' className='justify-content-between' key={appliance.id}>
+                                                <span>{appliance.name}</span>
+                                                <span>{`฿ ${appliance.price * appliance.amount * totalSection.total_length_section}`}</span>
                                             </Stack>
-                                        </Card.Body>
-                                    </Card>
-                                </FormCheck.Label>
-                            </FormCheck>
-                        </Form>
-                    </Card.Body>
-                </Card>
-                <FormCheck checked={confirm} onChange={onConfirm} id='confirm' className='mt-3' type='checkbox' label='ฉันรับทราบว่าฉันได้อ่านและยอมรับ เงื่อนไข ขาย และ นโยบายความเป้นส่วนตัว เรียบร้อยแล้ว' />
-            </Container>
-            <div className="position-fixed start-0 bottom-0 w-100 bg-white">
-                <Row className='p-3'>
-                    <Col xs='4'>
-                        <Button variant='outline-primary' onClick={handleBack} className='w-100'>ย้อนกลับ</Button>
-                    </Col>
-                    <Col xs='8'>
-                        {/* <Button as={Link} to={`/profile-market/payment`} disabled={!confirm} className='w-100'>เลือกช่องทางชำระเงิน</Button> */}
-                        <LinkContainer to={`/profile-market/payment`}>
-                            <Button className={`w-100 `} disabled={!confirm}>ยืนยันจองแผง</Button>
-                        </LinkContainer>
-                        {/* <Button className='w-100' onClick={onClickConfirm}>จ่ายค่าแผง</Button> */}
-                    </Col>
-                </Row>
-            </div>
-        </div>
+                                        )
+                                    })
+                                ) : null}
+                            </Stack>
+                        </>
+                    ) : null}
+                    <Stack direction='horizontal' className='mt-4 justify-content-between fw-bold'>
+                        <span>ยอดรวม</span>
+                        <span>{`฿ ${totalSection.total_price_appliance + totalSection.total_price_service + totalSection.total_price_section}`}</span>
+                    </Stack>
+                </Container>
+                <hr />
+                <Container className='pt-3'>
+                    <Card>
+                        <Card.Body>
+                            <Card.Title>
+                                วิธีชำระเงิน
+                            </Card.Title>
+                            <Form>
+                                <FormCheck id='payment1' className='mt-3 ps-0' type='radio'>
+                                    <FormCheck.Label className='w-100'>
+                                        <Card className={payment == 'qrcode' ? 'border-secondary' : null}>
+                                            <Card.Body>
+                                                <Stack direction='horizontal' className='align-items-center'>
+                                                    <FormCheck.Input name='payment' className='m-1' type='radio' value='qrcode' checked={payment === 'qrcode'} onChange={handleChange} />
+                                                    <span className='ms-2 me-auto'>ชำระผ่าน QR Code</span>
+                                                    <Icon icon='bi:qr-code' />
+                                                </Stack>
+                                            </Card.Body>
+                                        </Card>
+                                    </FormCheck.Label>
+                                </FormCheck>
+                            </Form>
+                        </Card.Body>
+                    </Card>
+                    <FormCheck checked={confirm} onChange={onConfirm} id='confirm' className='mt-3' type='checkbox' label='ฉันรับทราบว่าฉันได้อ่านและยอมรับ เงื่อนไข ขาย และ นโยบายความเป้นส่วนตัว เรียบร้อยแล้ว' />
+                </Container>
+                <div className="position-fixed start-0 bottom-0 w-100 bg-white">
+                    <Row className='p-3'>
+                        <Col xs='4'>
+                            <Button variant='outline-primary' onClick={handleBack} className='w-100'>ย้อนกลับ</Button>
+                        </Col>
+                        <Col xs='8'>
+                            {/* <Button as={Link} to={`/profile-market/payment`} disabled={!confirm} className='w-100'>เลือกช่องทางชำระเงิน</Button> */}
+                            {/* <LinkContainer to={`/profile-market/payment`}> */}
+                            <Button className={`w-100 `} disabled={!confirm} onClick={onClickConfirm}>ยืนยันจองแผง</Button>
+                            {/* </LinkContainer> */}
+                        </Col>
+                    </Row>
+                </div>
 
+            </div>
+        </Spin>
     )
 }
 

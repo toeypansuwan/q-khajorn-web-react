@@ -3,15 +3,14 @@ import SiteFixBottom from '../../components/SiteFixBottom/SiteFixBottom'
 import { Button, Row, Col, Container, Badge } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getMarkerDate, BASE_URL_API } from '../../services/services'
-import { Icon } from '@iconify/react'
 import axios from 'axios'
-import { Card, Switch, Space, Input, Button as AntBtn, message, Transfer, Modal } from 'antd';
+import { Card, Switch, Space, Input, Button as AntBtn, Transfer, Modal } from 'antd';
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux'
 import { setService as setServiceStore, addAppliances, editAppliances, removeAppliances } from '../../reducers/reserveSlice';
 
 import './Appliance.css'
-import liff from '@line/liff'
+
 import CustomConfigProvider from '../../Config/CustomConfigProvider'
 function Appliance() {
     const { id } = useParams();
@@ -19,9 +18,8 @@ function Appliance() {
     const dispatch = useDispatch()
     const [appliances, setAppliances] = useState([]);
     const [service, setService] = useState({});
-    const [profile, setProfile] = useState();
     const navigate = useNavigate();
-    const [messageApi, contextHolder] = message.useMessage();
+
     const handleBack = () => {
         navigate(-1);
     }
@@ -47,13 +45,6 @@ function Appliance() {
             const isCheck = reserveStore.services.service.status;
             setService({ ...dataService, isCheck });
         }
-        const liffFetch = async () => {
-            await liff.ready
-            const profile = await liff.getProfile()
-            console.log(profile);
-            setProfile(profile);
-        }
-        liffFetch();
         fetchStart();
     }, [])
     const fetchData = async ({ method = '', url = '' }) => {
@@ -149,34 +140,9 @@ function Appliance() {
     const handleCancel = () => {
         setIsModalOpen(false);
     };
-    const onClickConfirm = () => {
-        const data = {
-            line_id: profile.userId,
-            market_id: reserveStore.id_market,
-            zone_id: reserveStore.id_zone,
-            service: reserveStore.services.service.status ? 1 : 0,
-            sections: reserveStore.data.map(i => ({
-                id: i.id,
-                days: i.days
-            })),
-            appliances: reserveStore.services.appliances.map(i => ({
-                id: i.id,
-                amount: i.amount
-            }))
-        }
-        axios.post(`${BASE_URL_API}order/create`, data).then(res => {
-            if (res.data.res_code == 200) liff.closeWindow();
-        }).catch(err => {
-            messageApi.open({
-                type: 'error',
-                content: err.response.data.message
-            })
-        })
-    }
+
     return (
         <>
-            {contextHolder}
-
             <CustomConfigProvider type='secondary'>
                 <Modal
                     title="เพิ่ม/ลด อุปกรณ์เสริมต้องการเช่า"
@@ -293,7 +259,6 @@ function Appliance() {
                     </Col>
                     <Col xs='8'>
                         <Button as={Link} to={`/profile-market/payment`} className='w-100'>เลือกช่องทางชำระเงิน</Button>
-                        {/* <Button className='w-100' onClick={onClickConfirm}>จ่ายค่าแผง</Button> */}
                     </Col>
                 </Row>
             </SiteFixBottom>

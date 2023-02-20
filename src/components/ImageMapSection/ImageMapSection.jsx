@@ -7,7 +7,6 @@ import './ImageMapSection.css'
 import moment from 'moment/moment';
 import { useSelector } from 'react-redux';
 import { useGesture } from 'react-use-gesture';
-import { Alert } from 'antd'
 import { Badge } from 'react-bootstrap';
 
 const getCenterPoint = (shape, coords) => {
