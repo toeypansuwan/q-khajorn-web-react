@@ -11,6 +11,15 @@ $secondary:#E17D7D;
 $form-check-input-checked-bg-color:$secondary;
 $component-active-bg:$secondary;
 
+$font-size-base:              1rem;
+
+$h1-font-size:                32px;
+$h2-font-size:                27px;
+$h3-font-size:                24px;
+$h4-font-size:                20px;
+$h5-font-size:                17px;
+$h6-font-size:                $font-size-base;
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 // Then add additional custom code here

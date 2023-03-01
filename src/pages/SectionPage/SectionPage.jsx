@@ -44,42 +44,39 @@ function SectionPage() {
     const handleBack = () => {
         navigate(-1);
     }
-
     useEffect(() => {
         dispatch(setIdZone(id));
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
         configTaps();
     }, [])
-    // useEffect(() => {
-    //     // console.log("new", data);
-    // }, [data])
-
     const configTaps = async () => {
         const days = await getDays(id);
         try {
+            const items = [];
             for (let index = 0; index < getLengthDayOfMonth(); index++) {
                 const day = new Date(moment(moment().startOf('day'), "DD-MM-YYYY").add(index, 'days').format('YYYY-MM-DD'))
                 const isDay = day.toLocaleDateString('en', { weekday: 'long' });
                 if (days.includes(isDay)) {
                     const { mapArea } = await getSection({ d: day, id });
                     const plan = await getImagePlan();
-                    setItemsTab(i => {
-                        return [
-                            ...i,
-                            {
-                                label: <DaysList days={day} />,
-                                key: day,
-                                children: <ImageMapSection type="section" plan={plan} mapArea={mapArea} className="h-70" onClick={onClickSection} onLoad={(s, e) => { }} />,
-                            },
-                        ]
-                    })
+                    items.push({
+                        label: (<DaysList days={day} />),
+                        key: day,
+                        children: (<ImageMapSection type="section" plan={plan} mapArea={mapArea} className="h-70" onClick={onClickSection} onLoad={(s, e) => { }} />),
+                    });
                 }
             }
+            setItemsTab(items)
         } catch (err) {
             console.error(err)
         }
     }
+    // useEffect(() => {
+    //     // console.log("new", data);
+    // }, [data])
+
+
 
 
     const DaysList = (props) => {
@@ -118,25 +115,25 @@ function SectionPage() {
                 </div>
             </Container>
             <div className="position-relative">
-                <CustomConfigProvider>
-                    <Tabs
-                        defaultActiveKey="1"
-                        tabPosition='top'
-                        style={{
-                            height: `100%`,
-                            background: '#F1F5FA',
-                        }}
-                        destroyInactiveTabPane
-                        onChange={onChangeTab}
-                        items={itemsTab}
-                    >
-                        {itemsTab.sort((a, b) => new Date(a.key) - new Date(b.key)).map((tab) => (
-                            <Tabs.TabPane tab={tab.title} key={tab.key}>
-                                {tab.children}
-                            </Tabs.TabPane>
-                        ))}
-                    </Tabs>
-                </CustomConfigProvider>
+                {/* <CustomConfigProvider> */}
+                <Tabs
+                    defaultActiveKey="1"
+                    tabPosition='top'
+                    style={{
+                        height: `100%`,
+                        background: '#F1F5FA',
+                    }}
+                    destroyInactiveTabPane
+                    onChange={onChangeTab}
+                    items={itemsTab}
+                >
+                    {itemsTab.sort((a, b) => new Date(a.key) - new Date(b.key)).map((tab) => (
+                        <Tabs.TabPane tab={tab.title} key={tab.key}>
+                            {tab.children}
+                        </Tabs.TabPane>
+                    ))}
+                </Tabs>
+                {/* </CustomConfigProvider> */}
                 <div style={{ top: 80 }} className=" position-absolute start-0 w-100 p-3">
                     <Alert message="คุณสามารถลากนิ้วเพื่อย่อขยายได้" type="info" closable />
                 </div>

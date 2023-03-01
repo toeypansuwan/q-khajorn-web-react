@@ -143,40 +143,40 @@ function Appliance() {
 
     return (
         <>
-            <CustomConfigProvider type='secondary'>
-                <Modal
-                    title="เพิ่ม/ลด อุปกรณ์เสริมต้องการเช่า"
-                    open={isModalOpen}
-                    onOk={handleOk}
-                    onCancel={handleCancel}
-                    centered
-                    width={1000}
-                    // footer={
-                    //     <>
-                    //         <AntBtn type='primary' onClick={handleOk}>เลือก</AntBtn>
-                    //     </>
-                    // }
-                    footer={false}
-                >
-                    <Transfer
-                        className='tranfer-appliances'
-                        dataSource={appliances}
-                        titles={['คลังอุปกรณ์', 'อุปกรณ์ที่เลือก']}
-                        targetKeys={targetKeys}
-                        selectedKeys={selectedKeys}
-                        onChange={onChange}
-                        onSelectChange={onSelectChange}
-                        onScroll={onScroll}
-                        operations={['เพิ่มอุปกรณ์ที่เลือก']}
-                        oneWay
-                        listStyle={{
-                            height: 350,
-                        }}
-                        render={renderListItem}
-                        style={{ justifyContent: 'flex-end' }}
-                    />
-                </Modal>
-            </CustomConfigProvider>
+            {/* <CustomConfigProvider type='secondary'> */}
+            <Modal
+                title="เพิ่ม/ลด อุปกรณ์เสริมต้องการเช่า"
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                centered
+                width={1000}
+                // footer={
+                //     <>
+                //         <AntBtn type='primary' onClick={handleOk}>เลือก</AntBtn>
+                //     </>
+                // }
+                footer={false}
+            >
+                <Transfer
+                    className='tranfer-appliances'
+                    dataSource={appliances}
+                    titles={['คลังอุปกรณ์', 'อุปกรณ์ที่เลือก']}
+                    targetKeys={targetKeys}
+                    selectedKeys={selectedKeys}
+                    onChange={onChange}
+                    onSelectChange={onSelectChange}
+                    onScroll={onScroll}
+                    operations={['เพิ่มอุปกรณ์ที่เลือก']}
+                    oneWay
+                    listStyle={{
+                        height: 350,
+                    }}
+                    render={renderListItem}
+                    style={{ justifyContent: 'flex-end' }}
+                />
+            </Modal>
+            {/* </CustomConfigProvider> */}
 
 
             <Container className='pt-3 pb-200'>
@@ -203,7 +203,7 @@ function Appliance() {
                                 <p className='text-muted mb-0'>เพิ่มอุปกรณที่ตลาดมีให้ เช่น หลอดไฟ โต๊ะ ร่ม เป็นต้นอาจมีค่าบริการอุปกรณ์เสริมเพิ่มเติม</p>
                             </div>
                             <div className="mb-3">
-                                <AntBtn type='secondary' onClick={showModal}>
+                                <AntBtn onClick={showModal}>
                                     เพิ่ม/ลด อุปกรณ์
                                 </AntBtn>
                             </div>

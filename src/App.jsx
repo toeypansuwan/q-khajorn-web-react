@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import Routing from './AppRouting'
 
 // import 'antd/dist/antd.css';
-import 'antd/dist/antd.variable.min.css';
+// import 'antd/dist/antd.variable.min.css';
+import 'antd/dist/reset.css';
 import './Config/bootstrap.custom.scss'
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import { CustomConfigProvider, primary } from './Config/antd.custom';

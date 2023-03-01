@@ -8,7 +8,10 @@ const ZonePage = lazy(() => import('./pages/ZonePage/ZonePage'));
 const SectionPage = lazy(() => import('./pages/SectionPage/SectionPage'));
 const Appliance = lazy(() => import('./pages/Appliance/Appliance'));
 const LoginPage = lazy(() => import('./pages/Login/LoginPage'));
+const OrderList = lazy(() => import('./pages/OrderList/OrderList'));
+const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
 const PaymentGatewayPage = lazy(() => import('./pages/PaymentGatewayPage/PaymentGatewayPage'));
+const QrCode = lazy(() => import('./pages/QrCode/QrCode'));
 
 function AppRouting() {
   return (
@@ -23,7 +26,10 @@ function AppRouting() {
             <Route path=':id/section' element={<SectionPage />} />
             <Route path=':id/section/appliance' element={<Appliance />} />
             <Route path='payment' element={<PaymentGatewayPage />} />
+            <Route path='order/:orderId' element={<OrderList />} />
+            <Route path='order/:orderId/qr_code' element={<QrCode />} />
           </Route>
+          <Route path='*' element={<NotFound />} />
           <Route path='/login' element={<LoginPage />} />
         </Routes>
       </Suspense>

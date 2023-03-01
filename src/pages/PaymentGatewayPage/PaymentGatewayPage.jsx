@@ -7,6 +7,8 @@ import { Link } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 import liff from '@line/liff'
 import { message, Spin } from 'antd';
+import axios from 'axios';
+import { BASE_URL_API } from '../../services/services';
 
 const PaymentGatewayPage = () => {
     const { reserveStore } = useSelector(state => ({ ...state }));
@@ -69,17 +71,18 @@ const PaymentGatewayPage = () => {
                 amount: i.amount
             }))
         }
-        // axios.post(`${BASE_URL_API}order/create`, data).then(res => {
-        //     // if (res.data.res_code == 200) liff.closeWindow();
-        //     // navigate('/')
-        // }).catch(err => {
-        //     messageApi.open({
-        //         type: 'error',
-        //         content: err.response.data.message
-        //     })
-        // }).finally(() => {
-        //     setLoading(false)
-        // })
+        axios.post(`${BASE_URL_API}order/create`, data).then(res => {
+            if (res.data.res_code == 200) {
+                navigate(`../order/${res.data.order_id}`)
+            }
+        }).catch(err => {
+            messageApi.open({
+                type: 'error',
+                content: err.response.data.message
+            })
+        }).finally(() => {
+            setLoading(false)
+        })
     }
 
     const calculateTotal = (sections, appliances) => {

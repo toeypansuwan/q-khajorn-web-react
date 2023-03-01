@@ -36,7 +36,6 @@ const getCenterPoint = (shape, coords) => {
 function ImageMapSection(props) {
     const { reserveStore } = useSelector(state => ({ ...state }))
     const [zoom, setZoom] = useState(1);
-    const [initialDistance, setInitialDistance] = useState(0);
     const [crop, setCrop] = useState({ x: 0, y: 0, scale: 1, });
     const [areasMap, setAreasMap] = useState([]);
     const componentRef = useRef();

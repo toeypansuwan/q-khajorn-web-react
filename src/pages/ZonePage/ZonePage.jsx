@@ -78,13 +78,13 @@ function ZonePage() {
 
     return (
         <div className='h-zone-page'>
-            <div className="h-15vh container py-3">
+            <div className="h-15vh container py-3 shadow-sm border border-bottom">
                 <div className=" position-relative mb-3">
                     <button onClick={handleBack} className='btn position-absolute start-0 top-50 translate-middle-y'><Icon icon="eva:arrow-ios-back-fill" className='fs-3' /></button>
                     <h3 className='text-center'>เลือกโซน</h3>
                 </div>
 
-                <p>เลือกประเภทสินค้า</p>
+                <h5>เลือกประเภทสินค้า</h5>
                 <Select
                     defaultValue={selectData[0].value}
                     style={{
