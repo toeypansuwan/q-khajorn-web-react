@@ -60,23 +60,6 @@ function SearchMarket(props) {
     // map.Event.bind('location', locationUpdate);
     map.Event.bind('click', clickMap);
     map.zoom(zoomMap)
-    // for (const marker of data) {
-    //   map.Overlays.add(new longdo.Marker(marker.location, {
-    //     title: marker.name,
-    //     icon: {
-    //       url: 'https://map.longdo.com/mmmap/images/pin_mark.png',
-    //       offset: { x: 12, y: 45 }
-    //     },
-    //     detail: marker.openCloseTime,
-    //     visibleRange: { min: 10, max: 20 },
-    //   }));
-
-    //   // map.Overlays.add(new longdo.Popup(marker.location,
-    //   //   {
-    //   //     html: `<div style="background: #fff;padding:5px 10px;border-radius:20px;width:max-content">${marker.name}</div>`,
-    //   //   }
-    //   // ))
-    // }
     map.location(longdo.LocationMode.Geolocation)
     setCurrentLocation(true);
     setOpen(true);
@@ -99,6 +82,37 @@ function SearchMarket(props) {
   useEffect(() => {
     searchListMarket();
   }, [location])
+  useEffect(() => {
+    listData.data.forEach((marker) => {
+      map?.Overlays.add(new longdo.Marker({ lat: marker.lat, lon: marker.lon }, {
+        title: marker.name,
+        icon: {
+          url: 'https://map.longdo.com/mmmap/images/pin_mark.png',
+          offset: { x: 12, y: 45 }
+        },
+        detail: marker.openCloseTime,
+        visibleRange: { min: 10, max: 20 },
+      }));
+    })
+    map?.Overlays.clear()
+    // for (const marker of ) {
+    //   map.Overlays.add(new longdo.Marker({ lat: marker.lat, lon: marker.lon }, {
+    //     title: marker.name,
+    //     icon: {
+    //       url: 'https://map.longdo.com/mmmap/images/pin_mark.png',
+    //       offset: { x: 12, y: 45 }
+    //     },
+    //     detail: marker.openCloseTime,
+    //     visibleRange: { min: 10, max: 20 },
+    //   }));
+
+    //   //   // map.Overlays.add(new longdo.Popup(marker.location,
+    //   //   //   {
+    //   //   //     html: `<div style="background: #fff;padding:5px 10px;border-radius:20px;width:max-content">${marker.name}</div>`,
+    //   //   //   }
+    //   //   // ))
+    // }
+  }, [listData.data])
   const onChildrenDrawerClose = () => {
     setChildrenDrawer(false);
   };

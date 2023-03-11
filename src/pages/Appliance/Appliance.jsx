@@ -33,7 +33,6 @@ function Appliance() {
                 method: 'GET',
                 url: `${BASE_URL_API}market/${id}/appliance`,
             });
-
             const newData = dataAppliances.map(i => {
                 return { ...i, key: i.id }
             })

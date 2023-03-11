@@ -5,8 +5,8 @@ import { LinkContainer } from 'react-router-bootstrap'
 import ImageMapSection from '../../components/ImageMapSection/ImageMapSection';
 import moment from 'moment';
 import th from 'moment/dist/locale/th';
-import { getDays, getLengthDayOfMonth, getMarkerDate, getSection, BASE_URL_API } from '../../services/services'
-import { Tabs, Alert } from 'antd';
+import { getDays, getLengthDayOfMonth, getMarkerDate, getSection, BASE_URL_API, x } from '../../services/services'
+import { Tabs, Alert, Spin } from 'antd';
 import { Container, Button } from 'react-bootstrap'
 import { v4 as uuidv4 } from 'uuid';
 import { Icon } from '@iconify/react'
@@ -15,7 +15,7 @@ import SiteFixBottom from '../../components/SiteFixBottom/SiteFixBottom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIdZone } from '../../reducers/reserveSlice';
 import './SectionPage.css'
-import CustomConfigProvider from '../../Config/CustomConfigProvider';
+import ImageMapper from 'react-img-mapper';
 moment.locale('th', th);
 
 function SectionPage() {
@@ -24,12 +24,8 @@ function SectionPage() {
     const dataFetchedRef = useRef(false);
     const [dataTopUp, setDataTopUp] = useState({});
     const dispatch = useDispatch()
-    const reserveStore = useSelector(state => ({ ...state.reserveStore }))
-    // const [data, setData] = useState([{
-    //     id: 1,
-    //     title: "a1",
-    //     days: [],
-    // }])
+    const reserveStore = useSelector(state => ({ ...state.reserveStore }));
+    const [notification, setNotification] = useState([])
     const [topup, setTopup] = useState(false);
     const getImagePlan = async () => {
         try {
@@ -49,7 +45,9 @@ function SectionPage() {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
         configTaps();
+        getNotificationOrder();
     }, [])
+
     const configTaps = async () => {
         const days = await getDays(id);
         try {
@@ -100,12 +98,53 @@ function SectionPage() {
             price: e.price,
             day: e.day,
             status: e.status,
+            order_id: e.order_id,
         })
         setTopup(true)
     }
+
     const onChangeTab = (e) => {
         closeTopUp();
     }
+    const getNotificationOrder = async () => {
+        try {
+            const lineId = (await liff.getProfile()).userId;
+            const data = (await axios.post(`${BASE_URL_API}order/notification/`, { lineId })).data
+            setNotification(data);
+        } catch (err) {
+            console.error(err.response.data);
+        }
+
+    }
+    const onRequestNotification = async () => {
+        const { order_id, id, day } = dataTopUp;
+        if (!order_id) {
+            return;
+        }
+        try {
+            const lineId = (await liff.getProfile()).userId
+            const res = await (await axios.post(`${BASE_URL_API}order/notification/${order_id}`, { lineId, id, date: moment(day).format('YYYY-MM-DD') })).data
+            if (res.res_code == 200) {
+                setNotification((prev) => [
+                    ...prev, res.notification
+                ]);
+            }
+        } catch (err) {
+            console.error(err.response.data)
+        }
+
+    }
+    const onRemoveNotification = async (id) => {
+        const notificationFindId = notification.find(noti => noti.order_id === id)
+        try {
+            const data = (await axios.delete(`${BASE_URL_API}order/notification/${notificationFindId.id}/delete`)).data
+            if (data.res_code == 200)
+                setNotification(prev => prev.filter(noti => noti.id != notificationFindId.id))
+        } catch (err) {
+            console.error(err.response)
+        }
+    }
+
     return (
         <>
             <Container className='pt-3'>
@@ -115,7 +154,6 @@ function SectionPage() {
                 </div>
             </Container>
             <div className="position-relative">
-                {/* <CustomConfigProvider> */}
                 <Tabs
                     defaultActiveKey="1"
                     tabPosition='top'
@@ -133,12 +171,13 @@ function SectionPage() {
                         </Tabs.TabPane>
                     ))}
                 </Tabs>
-                {/* </CustomConfigProvider> */}
                 <div style={{ top: 80 }} className=" position-absolute start-0 w-100 p-3">
                     <Alert message="คุณสามารถลากนิ้วเพื่อย่อขยายได้" type="info" closable />
                 </div>
             </div>
-            <SiteFixBottom dataTopUp={dataTopUp} getMarkerDate={getMarkerDate} openTopup={topup} onCloseTopUp={closeTopUp} >
+
+
+            <SiteFixBottom dataTopUp={dataTopUp} getMarkerDate={getMarkerDate} openTopup={topup} onCloseTopUp={closeTopUp} onClickNotification={onRequestNotification} onRemoveNotification={() => onRemoveNotification(dataTopUp.order_id)} notifications={notification}>
                 <LinkContainer slot='buttonNext' to={`/profile-market/${id}/section/appliance`}>
                     <Button className={`w-100 `} disabled={reserveStore.data.length < 1}>ทำการจอง</Button>
                 </LinkContainer>
