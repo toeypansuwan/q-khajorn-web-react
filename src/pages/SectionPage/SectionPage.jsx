@@ -5,7 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap'
 import ImageMapSection from '../../components/ImageMapSection/ImageMapSection';
 import moment from 'moment';
 import th from 'moment/dist/locale/th';
-import { getDays, getLengthDayOfMonth, getMarkerDate, getSection, BASE_URL_API, x } from '../../services/services'
+import { getDays, getLengthDayOfMonth, getMarkerDate, getSection, BASE_URL_API } from '../../services/services'
 import { Tabs, Alert, Spin } from 'antd';
 import { Container, Button } from 'react-bootstrap'
 import { v4 as uuidv4 } from 'uuid';
@@ -61,7 +61,7 @@ function SectionPage() {
                     items.push({
                         label: (<DaysList days={day} />),
                         key: day,
-                        children: (<ImageMapSection type="section" plan={plan} mapArea={mapArea} className="h-70" onClick={onClickSection} onLoad={(s, e) => { }} />),
+                        children: (<ImageMapSection type="section" plan={plan} mapArea={mapArea} className="h-70" onClick={onClickSection} fullscreen={true} onLoad={(s, e) => { }} />),
                     });
                 }
             }

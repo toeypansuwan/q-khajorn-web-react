@@ -76,19 +76,23 @@ function ImageMapSection(props) {
     }, [props.plan])
     const ref = useRef(null)
     const setWidthImage = () => {
-        console.log(ref)
         const img = new Image();
         img.src = props.plan;
         img.onload = (e) => {
-            let aspectRatio, w, h;
-            if (e.target.width > e.target.height || e.target.width == e.target.height) {
-                aspectRatio = e.target.height / e.target.width;
-                w = ref.current.offsetHeight / aspectRatio;
-                h = aspectRatio * w;
+            let w, h;
+            let aspectRatio = e.target.height / e.target.width;
+            if (props.fullscreen) {
+                if ((e.target.width > e.target.height || e.target.width == e.target.height) && ref.current.offsetHeight > 0) {
+                    w = ref.current.offsetHeight / aspectRatio;
+                    h = aspectRatio * w;
+                } else {
+                    aspectRatio = e.target.height / e.target.width;
+                    h = ref.current.offsetWidth * aspectRatio;
+                    w = h / aspectRatio;
+                }
             } else {
-                aspectRatio = e.target.height / e.target.width;
-                h = ref.current.offsetWidth * aspectRatio;
-                w = h / aspectRatio;
+                w = ref.current.offsetWidth
+                h = aspectRatio * w
             }
             setZoom(w);
             setParent({ width: w, height: h })
@@ -120,6 +124,10 @@ function ImageMapSection(props) {
             rubberband: true
         },
     })
+    const refImage = useRef(null);
+    useEffect(() => {
+        refImage.current.childNodes[0].setAttribute("draggable", false);
+    }, [refImage])
     return (
         <div className={`overflow-hidden w-100 position-relative ${props.className}`} ref={ref}>
             <div
@@ -130,7 +138,7 @@ function ImageMapSection(props) {
                     height: parent.height,
                     width: parent.width,
                     touchAction: 'none',
-                    transform: `scale(${crop.scale})`
+                    transform: `scale(${crop.scale})`,
                 }}
                 className={`position-relative`} >
                 <ImageMapper
@@ -151,6 +159,7 @@ function ImageMapSection(props) {
                     parentWidth={zoom}
                     onClick={props.onClick}
                     onLoad={props.onLoad}
+                    containerRef={refImage}
                 />
                 {areasMap?.map(area => {
                     const shapeDetail = getCenterPointAndSize(area.shape, area.coords);

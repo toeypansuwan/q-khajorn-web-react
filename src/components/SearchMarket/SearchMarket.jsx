@@ -65,6 +65,7 @@ function SearchMarket(props) {
     setOpen(true);
   }
   const dragMap = () => {
+    map?.Overlays.clear()
     setCurrentLocation(false);
     setSuggestLocation([]);
     move.current = "drag"
@@ -83,6 +84,7 @@ function SearchMarket(props) {
     searchListMarket();
   }, [location])
   useEffect(() => {
+
     listData.data.forEach((marker) => {
       map?.Overlays.add(new longdo.Marker({ lat: marker.lat, lon: marker.lon }, {
         title: marker.name,
@@ -94,7 +96,6 @@ function SearchMarket(props) {
         visibleRange: { min: 10, max: 20 },
       }));
     })
-    map?.Overlays.clear()
     // for (const marker of ) {
     //   map.Overlays.add(new longdo.Marker({ lat: marker.lat, lon: marker.lon }, {
     //     title: marker.name,

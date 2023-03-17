@@ -95,7 +95,7 @@ function ZonePage() {
                 />
                 <Alert className='mt-3' message="คุณสามารถกดเลือกโซนบนผังตลาดได้" type="info" closable />
             </div>
-            <ImageMapSection plan={plan.image} mapArea={zoneData} type="zone" onClick={onChangePage} className="h-85vh" />
+            <ImageMapSection plan={plan.image} mapArea={zoneData} type="zone" onClick={onChangePage} fullscreen={true} className="h-85vh" />
 
         </div >
     )
