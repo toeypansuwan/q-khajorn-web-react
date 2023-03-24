@@ -31,7 +31,7 @@ const Login = () => {
                 <Stack direction={'vertical'} className="h-100 justify-content-center">
                     <div className="d-flex flex-column gap-4 mx-auto" style={{ maxWidth: 400, minWidth: 400 }}>
                         <div className="">
-                            <h2 className='text-center'>เข้าสู่ระบบ</h2>
+                            <h2 className='text-center'>เข้าสู่ระบบหลังบ้าน Q khajorn</h2>
                         </div>
                         <div className="">
                             <Form.Label htmlFor="username">ชื่อบัญชี</Form.Label>

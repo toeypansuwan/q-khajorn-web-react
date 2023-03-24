@@ -1,3 +1,4 @@
+import { message } from "antd";
 import axios from "axios";
 import moment from 'moment';
 import th from 'moment/dist/locale/th';
@@ -242,46 +243,39 @@ const days = [
         value: "Saturday",
     }
 ]
-const convertImageUrl = async (file, setState, fileList = []) => {
-    if (file instanceof FileList) {
-        // handle multiple files
-        const filesArray = Array.from(file);
-        const results = await Promise.all(
-            filesArray.map(async (file) => {
-                const reader = new FileReader();
-                return new Promise((resolve, reject) => {
-                    reader.onerror = () => {
-                        reader.abort();
-                        reject(new DOMException("Problem parsing input file."));
-                    };
+const convertImageUrl = async (file) => {
+    // handle single file
+    if (file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = () => {
+                reject(new Error("Problem parsing input file."));
+            };
+            reader.onload = (event) => {
+                const dataURL = event.target.result;
+                resolve({ imageUrl: dataURL });
+            };
+            reader.readAsDataURL(file.originFileObj);
 
-                    reader.onload = (event) => {
-                        const dataURL = event.target.result;
-                        resolve({ file: file.originFileObj, imageUrl: dataURL, fileList });
-                    };
-
-                    reader.readAsDataURL(file.originFileObj);
-                });
-            })
-        );
-        setState(results);
+        });
     } else {
-        // handle single file
-        const reader = new FileReader();
-        reader.onerror = () => {
-            console.error(new Error("Problem parsing input file."));
-        };
-        reader.onload = (event) => {
-            const dataURL = event.target.result;
-            setState({ file: file.originFileObj, imageUrl: dataURL, fileList });
-        };
-        reader.readAsDataURL(file.originFileObj);
+        return;
     }
 }
-const uploadImage = async ({ onSuccess }) => {
-    onSuccess("ok")
+const uploadImage = async (e) => {
+    e.onSuccess("ok")
 };
-
+const beforeUpload = (file) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+        message.error('You can only upload JPG/PNG file!');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+        message.error('Image must smaller than 2MB!');
+    }
+    return isJpgOrPng && isLt2M;
+};
 export {
     nameDaysFormat,
     binarySearch,
@@ -299,5 +293,6 @@ export {
     hasValidCoordinatePairs,
     days,
     convertImageUrl,
-    uploadImage
+    uploadImage,
+    beforeUpload
 }

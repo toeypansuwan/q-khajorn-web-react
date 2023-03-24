@@ -46,6 +46,9 @@ function SectionPage() {
         dataFetchedRef.current = true;
         configTaps();
         getNotificationOrder();
+        return () => {
+            setItemsTab([]);
+        }
     }, [])
 
     const configTaps = async () => {
