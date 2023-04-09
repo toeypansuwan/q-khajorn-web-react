@@ -31,11 +31,6 @@ import 'froala-editor/js/plugins/inline_class.min.js';
 import 'froala-editor/js/plugins/paragraph_format.min.js';
 import 'froala-editor/js/plugins/lists.min.js';
 
-
-
-
-
-
 import axios from 'axios';
 import AreaInformationCollector from '../AreaInformationCollector/AreaInformationCollector';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -44,6 +39,7 @@ import "swiper/css/pagination";
 import "swiper/css";
 import { stringify, v4 } from 'uuid';
 import { config } from 'dotenv';
+import { useNavigate } from 'react-router-dom';
 
 const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
     const mapKey = import.meta.env.VITE_LONGDOMAP_API_KEY;
@@ -74,8 +70,10 @@ const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
         close: ''
     });
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [content, setContent] = useState();
     const [key, setKey] = useState({ key: "", isKeyVerify: false });
     const [promptpay, setPromptpay] = useState({ number_phone: "", id_card_number: "" });
+    const navigate = useNavigate();
 
     const showModal = (event = null, accessory) => {
         if (event === 'edit') {
@@ -216,7 +214,7 @@ const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
             width: 390,
         });
         return () => {
-            editor = null;
+            // editor = null;
         };
     }, []);
 
@@ -359,7 +357,7 @@ const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
         return {
             key: zone.id,
             label: zone.title ? `โซน ${zone.title}` : `โซน ${i + 1}`,
-            children: <AreaInformationCollector planArea={zone.plan} setArea={handleSetAreaZone} setImagePlan={handleSetImageZone} type="zone" />
+            children: <AreaInformationCollector planArea={zone.plan} setArea={handleSetAreaZone} setImagePlan={handleSetImageZone} type="section" />
         }
     })
     const onDestroyAccessory = (id) => {
@@ -394,30 +392,88 @@ const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
         const formatted = cleaned.replace(/^(\d{1})(\d{4})(\d{5})(\d{2})(\d{1})$/, "$1-$2-$3-$4-$5");
         return formatted;
     };
+    const convertToAxis = (arr) => {
+        const newArr = arr.map((item, index) => {
+            if (index % 2 === 0) {
+                return { axis_x: item };
+            } else {
+                return { axis_y: item };
+            }
+        });
+        const result = [];
+        newArr.forEach((item, index) => {
+            if (index % 2 === 0) {
+                result.push(Object.assign({}, item, newArr[index + 1]));
+            }
+        });
+        return result;
+    }
     const sendForm = () => {
         const config = {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
+            headers: { Authorization: `Bearer ${token}` }
         }
-        const form = new FormData();
-        form.append("market_name", "sss")
-        form.append("image", imageProfile[0].file);
-        console.log(imageProfile[0].file)
-        form.append('zones[0][name]', 'Zone 1');
-        form.append('zones[1][name]', 'Zone 2');
-        form.append('zones[0][image]', galleries[0].file);
-        form.append('zones[1][image]', galleries[0].file);
-        // form.append("zones[0][name]", "zone2");
-        // form.append("zones[0][image]", galleries[1].file);
-        console.log(form.get('zones[0][image]'))
-        axios.post(`${BASE_URL_API}market/test-upload`, form, config).then(res => {
-            console.log(res.data)
+        const data = {
+            key: key.key,
+            name: marketName,
+            image: imageProfile[0]?.response?.filename,
+            time_open: time.open,
+            time_close: time.close,
+            lat: location.lat.toString(),
+            lon: location.lon.toString(),
+            detail: content,
+            image_plan: plan.imagePlan[0]?.response?.filename,
+            service_price: servicePrice,
+            mobile_number: promptpay.number_phone,
+            id_card_number: promptpay.id_card_number,
+            daysname: selectDays,
+            galleries: galleries.map(gallery => gallery.response?.filename),
+            categories: options.map(option => ({
+                id: option.id || "",
+                name: option.value
+            })),
+            zones: plan.areaPlan.map(zone => {
+                return {
+                    name: zone.title,
+                    color: zone.preFillColor,
+                    image_plan: zone.plan.imagePlan[0]?.response?.filename,
+                    shape: zone.shape,
+                    categories: zone.categories.map(category => ({
+                        id: category.id || "",
+                        name: category.value
+                    })),
+                    points: convertToAxis(zone.coords),
+                    sections_zone: zone.plan.areaPlan.map(section => {
+                        return {
+                            name: section.title,
+                            price: section.price,
+                            status: 1,
+                            shape: section.shape,
+                            image: section.file[0]?.response?.filename,
+                            points: convertToAxis(section.coords)
+                        }
+                    })
+                }
+            }),
+            accessories: accessories.map(accessory => (
+                {
+                    name: accessory.name,
+                    price: parseFloat(accessory.price),
+                    image: accessory.file[0]?.response?.filename,
+                }
+            ))
+        }
+        axios.post(`${BASE_URL_API}market/create`, data, config).then(res => {
+            if (res.data.res_code == 200) {
+                message.success("บันทึกสำเร็จ")
+                setInterval(() => {
+                    navigate('/system/')
+                }, 1500)
+            }
         }).catch(error => {
-            console.error(error);
+            message.error(error.response.data.message?.message[0] || "เกิดปัญหา")
+            console.error(error.response.data.message);
         })
     }
-
     return (
         <>
             <div className=" position-sticky top-0 bg-white" style={{ zIndex: 999 }}>
@@ -581,7 +637,7 @@ const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
                     </Col>
                 </Row>
                 <hr className='mb-5' />
-                <AreaInformationCollector planArea={plan} setArea={handleSetAreaPlan} setImagePlan={handleSetImagePlan} options={options} />
+                <AreaInformationCollector planArea={plan} setArea={handleSetAreaPlan} setImagePlan={handleSetImagePlan} options={options} type="zone" />
                 <Tabs defaultActiveKey="1" onChange={(key) => { zoneId.current = key }} items={tabsZoneItems} destroyInactiveTabPane />
                 <Row>
                     <Col>

@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { nameDaysFormat } from '../../services/services'
 import { useDispatch } from 'react-redux';
 import { setIdMarket } from '../../reducers/reserveSlice';
+import DOMPurify from 'dompurify';
 
 import "swiper/css/pagination";
 import "swiper/css";
@@ -104,7 +105,7 @@ function ProfileMarket() {
                                 <h5 className='fw-bold text-dark'>{profileData.min} บาท</h5>
                             </div>
                         </div>
-                        <div className="content" dangerouslySetInnerHTML={{ __html: profileData.detail }}>
+                        <div className="content" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(profileData.detail) }}>
 
                         </div>
                         <div className="position-fixed bottom-0 bg-white shadow-lg start-0 w-100">

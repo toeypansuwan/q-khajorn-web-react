@@ -37,6 +37,11 @@ const checkAuth = () => {
         return false;
     }
 };
+const logoutUser = () => {
+    localStorage.removeItem('accessToken');
+    // navigate('/system/login');
+    return true;
+}
 
 const switchRich = async (key) => {
     try {
@@ -58,5 +63,6 @@ export {
     loginUser,
     token,
     switchRich,
-    checkAuth
+    checkAuth,
+    logoutUser
 }

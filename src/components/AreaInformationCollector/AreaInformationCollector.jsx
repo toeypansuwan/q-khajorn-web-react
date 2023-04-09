@@ -17,10 +17,10 @@ const AreaInformationCollector = ({ planArea, setArea, options, setImagePlan, ty
         <>
             <Row className='my-3'>
                 <Col xs='8'>
-                    <h4>{type === "zone" ? "แผง" : "โซน"}</h4>
+                    <h4>{type === "section" ? "แผง" : "โซน"}</h4>
                 </Col>
                 <Col xs='4'>
-                    <h4>{type === "zone" ? "เลือกพื้นที่ แผง" : "เลือกพื้นที่ โซน"}</h4>
+                    <h4>{type === "section" ? "เลือกพื้นที่ แผง" : "เลือกพื้นที่ โซน"}</h4>
                 </Col>
             </Row >
             <Row>
@@ -29,7 +29,7 @@ const AreaInformationCollector = ({ planArea, setArea, options, setImagePlan, ty
                         {planArea?.imagePlan[0]?.response?.filename ? (
                             <>
                                 <div className="mb-3 border">
-                                    <ImageMapSection type="section" plan={image} mapArea={planArea.areaPlan} className="h-70" />
+                                    <ImageMapSection type={type} plan={image} mapArea={planArea.areaPlan} className="h-70" />
                                 </div>
                                 <Upload action={`${BASE_URL_API}upload/file`} beforeUpload={beforeUpload} showUploadList={false} onChange={async ({ file }) => {
                                     if (file.status === 'done') {

@@ -5,10 +5,14 @@ import { LinkContainer } from 'react-router-bootstrap';
 import AdminLayout from '../../../Layouts/AdminLayout';
 import axios from 'axios';
 import { BASE_URL_API } from '../../../services/services';
+import { token } from '../../../services/AuthServices';
+import { message, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons'
 
 const Home = () => {
     const [markets, setMarkets] = useState([]);
     const [keyword, setKeyword] = useState("");
+    const [modal, contextHolder] = Modal.useModal();
     useEffect(() => {
         getMarkets().then(data => setMarkets(data))
     }, [])
@@ -20,8 +24,30 @@ const Home = () => {
             console.error(err.response.data)
         }
     }
+    const onDestroy = (id, title) => {
+
+        modal.confirm({
+            title: `ยืนยันการลบ ${title}` || 'ยืนยันการลบตลาด',
+            icon: <ExclamationCircleOutlined />,
+            content: `คุณมันใจที่จะลบ${title}หรือไม่ หากคุณยืนยันจะไม่สามารถแก้ไขได้`,
+            okText: 'ยืนยันการลบ',
+            cancelText: 'ยกเลิกการลบ',
+            onOk: () => {
+                const config = {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+                axios.delete(`${BASE_URL_API}market/delete/${id}`, config).then(({ data }) => {
+                    if (data.res_code == 200) {
+                        message.success("ลบสำเร็จ")
+                        getMarkets().then(data => setMarkets(data))
+                    }
+                }).catch(error => console.error(error))
+            }
+        });
+    }
     return (
         <AdminLayout isAdmin={true}>
+            {contextHolder}
             <Container className='py-3'>
                 <Stack direction='horizontal' className='align-items-center justify-content-between mb-3'>
                     <h4>ตลาดทั้งหมด</h4>
@@ -58,7 +84,7 @@ const Home = () => {
                                                     <Button variant='' className='me-2'>
                                                         <Icon className="text-primary fs-4" icon='material-symbols:edit' />
                                                     </Button>
-                                                    <Button variant=''>
+                                                    <Button variant='' onClick={() => onDestroy(market.id, market.name)}>
                                                         <Icon className="text-secondary fs-4" icon='material-symbols:delete-outline' />
                                                     </Button>
                                                 </>
