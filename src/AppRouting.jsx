@@ -19,7 +19,6 @@ const Home = lazy(() => import('./pages/Admin/Home/Home'));
 const Create = lazy(() => import('./pages/Admin/Create/Create'));
 const Update = lazy(() => import('./pages/Admin/Update/Update'));
 
-
 function AppRouting() {
   return (
     <BrowserRouter basename='/dist'>
