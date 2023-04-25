@@ -21,8 +21,7 @@ const Update = lazy(() => import('./pages/Admin/Update/Update'));
 
 function AppRouting() {
   return (
-    <BrowserRouter basename='/dist'>
-      {/* <BrowserRouter > */}
+    <BrowserRouter>
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/system" element={<PrivateRoutes />}>
