@@ -11,13 +11,13 @@ module.exports = {
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                use: {
-                    loader: "babel-loader",
-                    options: {
-                        cacheDirectory: true,
-                        presets: ['react', 'es2015', 'stage-2']
-                    }
-                }
+                use: [
+                    {
+                        loader: "babel-loader",
+                        options: {
+                            presets: ['es2015', 'stage-0']
+                        }
+                    }]
             },
             {
                 test: /\.css$/,
