@@ -29,7 +29,6 @@ function SearchMarket(props) {
   const [childrenDrawer, setChildrenDrawer] = useState(false);
   const move = useRef("");
   const [suggestLocation, setSuggestLocation] = useState([]);
-  const [keywordSearch, setKeywordSearch] = useState('');
   const [currentLocation, setCurrentLocation] = useState(false);
   const [zoomMap, setZoomMap] = useState(15);
   const [location, setLocation] = useState({});
@@ -57,7 +56,6 @@ function SearchMarket(props) {
     map.Search.language('th');
     map.Event.bind('drag', dragMap);
     map.Event.bind('drop', dropMap);
-    // map.Event.bind('location', locationUpdate);
     map.Event.bind('click', clickMap);
     map.zoom(zoomMap)
     map.location(longdo.LocationMode.Geolocation)
@@ -96,23 +94,6 @@ function SearchMarket(props) {
         visibleRange: { min: 10, max: 20 },
       }));
     })
-    // for (const marker of ) {
-    //   map.Overlays.add(new longdo.Marker({ lat: marker.lat, lon: marker.lon }, {
-    //     title: marker.name,
-    //     icon: {
-    //       url: 'https://map.longdo.com/mmmap/images/pin_mark.png',
-    //       offset: { x: 12, y: 45 }
-    //     },
-    //     detail: marker.openCloseTime,
-    //     visibleRange: { min: 10, max: 20 },
-    //   }));
-
-    //   //   // map.Overlays.add(new longdo.Popup(marker.location,
-    //   //   //   {
-    //   //   //     html: `<div style="background: #fff;padding:5px 10px;border-radius:20px;width:max-content">${marker.name}</div>`,
-    //   //   //   }
-    //   //   // ))
-    // }
   }, [listData.data])
   const onChildrenDrawerClose = () => {
     setChildrenDrawer(false);
@@ -122,7 +103,6 @@ function SearchMarket(props) {
   }
 
   const showDrawer = () => {
-    // console.log(profile)
     setOpen(true);
   };
 
@@ -130,38 +110,6 @@ function SearchMarket(props) {
     setOpen(false);
   };
 
-
-
-  const doSearch = () => {
-    axios(`https://search.longdo.com/mapsearch/json/search?keyword=${keywordSearch}&limit=1&key=${mapKey}`).then((res) => {
-      const { lat, lon } = res.data.data[0];
-      setZoomMap(12);
-      map.location({ lon, lat });
-      map.zoom(zoomMap);
-      setLocation({ lon, lat })
-      searchListMarket();
-    }).catch(err => {
-      console.log(err);
-    })
-    setSuggestLocation([]);
-  }
-  const onPressEnter = (e) => {
-    if ((e || window.event).keyCode != 13)
-      return;
-    doSearch();
-  }
-  const onChangeSearch = (e) => {
-    setKeywordSearch(e.target.value);
-    axios.get(`https://search.longdo.com/mapsearch/json/suggest?keyword=${keywordSearch}&limit=8&key=${mapKey}`).then((res) => {
-      setSuggestLocation(res.data.data);
-    }).catch(err => {
-      console.log(err);
-    })
-  }
-  const onClickListKeyword = (item) => {
-    setKeywordSearch(item);
-    doSearch();
-  }
   const clickMap = () => {
     setSuggestLocation([]);
   }
@@ -196,14 +144,6 @@ function SearchMarket(props) {
   return (
     <div className='h-screen'>
       <div className="position-fixed top-0 w-100 start-50 translate-middle-x p-4" style={{ zIndex: 10 }}>
-        {/* <ul className="list-group mt-2 list-style-none shadow-sm">
-          <Input value={keywordSearch} size="large" onKeyUp={onPressEnter} onChange={onChangeSearch} className='list-group-item d-inline-flex' placeholder="สถานที่ใกล้เคียง หรือ ที่คุณต้องการ" allowClear prefix={<Icon icon="akar-icons:location" className='text-secondary fs-3' />} />
-          {
-            suggestLocation.map((prevLocatin, i) => (
-              <li key={i} className="list-group-item list-group-item-action" onClick={() => onClickListKeyword(prevLocatin.w)} aria-current="true">{prevLocatin.w}</li>
-            ))
-          }
-        </ul> */}
       </div>
       <div className="d-grid position-fixed top-50 end-0 translate-middle-y me-3 gap-3 " style={{ zIndex: 10 }}>
         <div className={`map__btn ${currentLocation ? 'active' : ''}`}><Icon icon="bx:current-location" className='fs-4' onClick={getLocation} /></div>

@@ -6,16 +6,13 @@ import ImageMapSection from '../../components/ImageMapSection/ImageMapSection';
 import moment from 'moment';
 import th from 'moment/dist/locale/th';
 import { getDays, getLengthDayOfMonth, getMarkerDate, getSection, BASE_URL_API } from '../../services/services'
-import { Tabs, Alert, Spin } from 'antd';
+import { Tabs, Alert } from 'antd';
 import { Container, Button } from 'react-bootstrap'
-import { v4 as uuidv4 } from 'uuid';
 import { Icon } from '@iconify/react'
 import SiteFixBottom from '../../components/SiteFixBottom/SiteFixBottom';
-// const SiteFixBottom = lazy(() => import('../../components/SiteFixBottom/SiteFixBottom'))
 import { useDispatch, useSelector } from 'react-redux';
 import { setIdZone } from '../../reducers/reserveSlice';
 import './SectionPage.css'
-import ImageMapper from 'react-img-mapper';
 moment.locale('th', th);
 
 function SectionPage() {
@@ -73,12 +70,6 @@ function SectionPage() {
             console.error(err)
         }
     }
-    // useEffect(() => {
-    //     // console.log("new", data);
-    // }, [data])
-
-
-
 
     const DaysList = (props) => {
         return (
@@ -86,7 +77,6 @@ function SectionPage() {
                 <span className='text-muted'>{moment(props.days).format('dd')}</span>
                 <p className='h4 mb-0'>{moment(props.days).format('D')}</p>
                 <span className='text-muted'>{moment(props.days).format('MMM')}</span>
-                {/* <span className='text-secondary'>{moment(props.days).format('MMM')}</span> */}
             </div>
         )
     };

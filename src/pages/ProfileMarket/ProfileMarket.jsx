@@ -65,15 +65,6 @@ function ProfileMarket() {
     })
 
     return (
-        // <div>
-        //     {id}
-        //     <div className="grid grid-cols-2 gap-3 p-3">
-        //         <Button block className='span' onClick={handleBack}>ย้อนกลับ</Button>
-        //         <Button type="primary" danger>
-        //             ดูผังตลาด
-        //         </Button>
-        //     </div>
-        // </div>
         <div className='h-screen flex-col flex justify-between'>
             {!loadData ? null : (
                 <div className="detail__market">
@@ -123,13 +114,6 @@ function ProfileMarket() {
                     </div>
                 </div>
             )}
-            {/* <div className="grid grid-cols-2 gap-3 p-3">
-                <Button block className='span' onClick={handleBack}>ย้อนกลับ</Button>
-                <Button type="primary" danger>
-                    ดูผังตลาด
-                </Button>
-            </div> */}
-
         </div>
     )
 }

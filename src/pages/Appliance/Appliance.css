@@ -21,17 +21,12 @@
 }
 
 .tranfer-appliances {
-    /* Make the Transfer container take up 100% of the available width */
     width: 100%;
     gap: 0.5rem;
 }
 
-/* Apply the following styles to the list */
 .tranfer-appliances .ant-transfer-list {
-    /* Make the list take up 50% of the available width on screens smaller than 768px */
     width: 50%;
-
-    /* Make the list take up 100% of the available width on screens larger than 768px */
 }
 
 

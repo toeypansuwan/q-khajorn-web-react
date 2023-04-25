@@ -1,6 +1,5 @@
 import React, { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-// import Home from './pages/Admin/Home/Home';
 import Loading from './services/Loading/Loading';
 import PrivateRoutes from './untils/PrivateRoutes'
 
@@ -18,6 +17,7 @@ const QrCode = lazy(() => import('./pages/QrCode/QrCode'));
 const Login = lazy(() => import('./pages/Admin/Login/Login'));
 const Home = lazy(() => import('./pages/Admin/Home/Home'));
 const Create = lazy(() => import('./pages/Admin/Create/Create'));
+const Update = lazy(() => import('./pages/Admin/Update/Update'));
 
 
 function AppRouting() {
@@ -29,6 +29,7 @@ function AppRouting() {
           <Route path="/system" element={<PrivateRoutes />}>
             <Route index element={<Home />} />
             <Route path='create' element={<Create />} />
+            <Route path=':id/edit' element={<Update />} />
           </Route>
           <Route path='/system/login' element={<Login />} />
           <Route path='/' element={<FirstPage />} />

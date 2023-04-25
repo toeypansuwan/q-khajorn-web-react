@@ -11,7 +11,6 @@ import { setService as setServiceStore, addAppliances, editAppliances, removeApp
 
 import './Appliance.css'
 
-import CustomConfigProvider from '../../Config/CustomConfigProvider'
 function Appliance() {
     const { id } = useParams();
     const reserveStore = useSelector(state => ({ ...state.reserveStore }))
@@ -115,7 +114,6 @@ function Appliance() {
                         title={
                             <Row className=' justify-content-between'>
                                 <Col>{item.name}</Col>
-                                {/* <Col xs={'auto'}><DeleteOutlined /></Col> */}
                             </Row>
                         }
                         description={
@@ -142,7 +140,6 @@ function Appliance() {
 
     return (
         <>
-            {/* <CustomConfigProvider type='secondary'> */}
             <Modal
                 title="เพิ่ม/ลด อุปกรณ์เสริมต้องการเช่า"
                 open={isModalOpen}
@@ -150,11 +147,6 @@ function Appliance() {
                 onCancel={handleCancel}
                 centered
                 width={1000}
-                // footer={
-                //     <>
-                //         <AntBtn type='primary' onClick={handleOk}>เลือก</AntBtn>
-                //     </>
-                // }
                 footer={false}
             >
                 <Transfer
@@ -175,12 +167,10 @@ function Appliance() {
                     style={{ justifyContent: 'flex-end' }}
                 />
             </Modal>
-            {/* </CustomConfigProvider> */}
 
 
             <Container className='pt-3 pb-200'>
                 <div className=" position-relative">
-                    {/* <button onClick={handleBack} className='btn position-absolute start-0 top-50 translate-middle-y'><Icon icon="eva:arrow-ios-back-fill" className='fs-3' /></button> */}
                     <h4 className='text-center'>เลือกอุปกรณ์เสริม</h4>
                 </div>
                 <div className="py-3">
@@ -193,6 +183,7 @@ function Appliance() {
                             <Switch checked={service.isCheck} onClick={() => {
                                 const isCheck = !service.isCheck
                                 setService(prev => ({ ...prev, isCheck }))
+                                console.log({ status: isCheck, price: isCheck ? service.price : 0 })
                                 dispatch(setServiceStore({ status: isCheck, price: isCheck ? service.price : 0 }))
                             }} checkedChildren="ใช้ไฟฟ้า" unCheckedChildren="ไม่ใช้ไฟฟ้า" />
                         </div>

@@ -74,9 +74,6 @@ const getLengthDayOfMonth = (date = null) => {
         currentDay = moment().startOf('day');
     }
     const endDayOfMonth = moment().endOf('month').add(1, 'month');
-    // console.log(endDayOfMonth.diff(currentDay, 'days'))
-    // console.log("statt", currentDay.format("DD-MM-YYYY"), "end", endDayOfMonth.format("DD-MM-YYYY"))
-    // .add(2, 'month')
     return endDayOfMonth.diff(currentDay, 'days');
 }
 const getMarkerDate = async ({ date, id_zone }) => {

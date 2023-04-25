@@ -38,13 +38,10 @@ function ZonePage() {
                     preFillColor: color,
                     coords: polygon.flat(1),
                     polygon,
-                    // href: `/profile-market/${id}/section`
                 }
 
             })
             setZoneData(mapArea)
-
-            // console.log(mapArea)
         }).catch(err => {
             console.error(err.response)
         })
@@ -72,7 +69,6 @@ function ZonePage() {
         getZone(category_id);
     };
     const onChangePage = (e) => {
-        // console.log(e.id)
         navigate(`/profile-market/${e.id}/section`)
     }
 

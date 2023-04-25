@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
 import { BASE_URL_API, beforeUpload, hasValidCoordinatePairs } from '../../services/services'
-import { Button, Collapse, Input, Radio, Select, InputNumber, Upload, Form as FormAntd } from 'antd';
+import { Button, Collapse, Input, Radio, Select, InputNumber, Upload } from 'antd';
 import { v4 as uuidv4 } from 'uuid'
 import { Icon } from '@iconify/react';
 import { Stack, Form } from 'react-bootstrap'
@@ -120,7 +119,6 @@ const AreaCreate = ({ areas, setArea, categories, type }) => {
                                                 defaultValue={area.price}
                                                 min={0}
                                                 formatter={(value) => `฿ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                                // parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                                                 onChange={value => onUpdateArea(area.id, { target: { value, name: 'price' } })}
                                             />
                                         </div>

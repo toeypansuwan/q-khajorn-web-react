@@ -39,11 +39,10 @@ import "swiper/css/pagination";
 import "swiper/css";
 import { stringify, v4 } from 'uuid';
 import { config } from 'dotenv';
-import { useNavigate } from 'react-router-dom';
 
-const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
+const CreateAndUpdateComponent = ({ initialData, onSubmit }) => {
     const mapKey = import.meta.env.VITE_LONGDOMAP_API_KEY;
-    const [marketName, setMarketName] = useState();
+    const [marketName, setMarketName] = useState("");
     const [plan, setPlan] = useState({
         imagePlan: [],
         areaPlan: [],
@@ -73,7 +72,7 @@ const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
     const [content, setContent] = useState();
     const [key, setKey] = useState({ key: "", isKeyVerify: false });
     const [promptpay, setPromptpay] = useState({ number_phone: "", id_card_number: "" });
-    const navigate = useNavigate();
+
 
     const showModal = (event = null, accessory) => {
         if (event === 'edit') {
@@ -249,13 +248,6 @@ const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
         map.Event.bind('overlayMove', function (overlay) {
             setLocation(overlay.location())
         });
-
-        // map.Search.language('th');
-        // map.Event.bind('drag', dragMap);
-        // map.Event.bind('drop', dropMap);
-        // map.Event.bind('click', clickMap);
-        // map.zoom(zoomMap)
-        // map.location(longdo.LocationMode.Geolocation)
     }
     const addMarker = (location = {}) => {
         const newLocation = location?.lat && location?.lon ? { lat: location.lat, lon: location.lon } : map.location();
@@ -409,9 +401,6 @@ const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
         return result;
     }
     const sendForm = () => {
-        const config = {
-            headers: { Authorization: `Bearer ${token}` }
-        }
         const data = {
             key: key.key,
             name: marketName,
@@ -462,17 +451,7 @@ const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
                 }
             ))
         }
-        axios.post(`${BASE_URL_API}market/create`, data, config).then(res => {
-            if (res.data.res_code == 200) {
-                message.success("บันทึกสำเร็จ")
-                setInterval(() => {
-                    navigate('/system/')
-                }, 1500)
-            }
-        }).catch(error => {
-            message.error(error.response.data.message?.message[0] || "เกิดปัญหา")
-            console.error(error.response.data.message);
-        })
+        onSubmit(data);
     }
     return (
         <>
@@ -558,11 +537,6 @@ const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
                                                 setImageProfile(fileList)
                                             }
                                             if (file.status === "removed") {
-                                                // axios.delete(`${BASE_URL_API}upload/file/${file.response?.filename}`).then(
-                                                //     message.success("ลบสำเร็จ")
-                                                // ).catch((error) => {
-                                                //     console.error(error)
-                                                // })
                                                 setImageProfile(prevImageProfile => prevImageProfile.filter(image => image.uid !== file.uid))
                                             }
                                         }} multiple={false} listType="picture-card">
@@ -581,11 +555,6 @@ const CreateAndUpdateComponent = ({ initialData, onCreate, onUpdate }) => {
                                                 setGalleries(fileList)
                                             }
                                             if (file.status === "removed") {
-                                                // axios.delete(`${BASE_URL_API}upload/file/${file.response?.filename}`).then(
-                                                //     message.success("ลบสำเร็จ")
-                                                // ).catch((error) => {
-                                                //     console.error(error)
-                                                // })
                                                 setGalleries(prevGalleries => prevGalleries.filter(gallery => gallery.uid !== file.uid))
                                             }
                                         }} multiple={false} listType="picture-card">

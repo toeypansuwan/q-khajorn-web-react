@@ -224,9 +224,18 @@ function SiteFixBottom({
                                 const days = cur.days.length;
                                 const appliPrice = reserveStore.services.appliances.reduce((totalAppli, curAppli) => totalAppli + curAppli.price * curAppli.amount, 0) * days
                                 const service = reserveStore.services.service.price * days;
-                                return total + cur.price * days + appliPrice + service;
-                            }, 0)
-                        } บาท</h3>
+                                return (total + cur.price * days + appliPrice + service);
+                            }, 0).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+
+                            // .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                        }บาท</h3>
+
+                        {console.log(reserveStore.data.reduce((total, cur) => {
+                            const days = cur.days.length;
+                            const appliPrice = reserveStore.services.appliances.reduce((totalAppli, curAppli) => totalAppli + curAppli.price * curAppli.amount, 0) * days
+                            const service = reserveStore.services.service.price * days;
+                            return (total + cur.price * days + appliPrice + service);
+                        }, 0))}
                     </Col>
                 </Row>
                 {buttonNext}

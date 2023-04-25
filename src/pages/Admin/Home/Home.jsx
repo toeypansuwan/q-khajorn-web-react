@@ -8,11 +8,13 @@ import { BASE_URL_API } from '../../../services/services';
 import { token } from '../../../services/AuthServices';
 import { message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
     const [markets, setMarkets] = useState([]);
     const [keyword, setKeyword] = useState("");
     const [modal, contextHolder] = Modal.useModal();
+    const navigate = useNavigate();
     useEffect(() => {
         getMarkets().then(data => setMarkets(data))
     }, [])
@@ -44,6 +46,9 @@ const Home = () => {
                 }).catch(error => console.error(error))
             }
         });
+    }
+    const onEdit = (id) => {
+        navigate(`${id}/edit`)
     }
     return (
         <AdminLayout isAdmin={true}>
@@ -81,9 +86,9 @@ const Home = () => {
                                             <Stack direction='horizontal' className=' justify-content-between'>
                                                 <Card.Title className='col'>{market.name}</Card.Title>
                                                 <>
-                                                    <Button variant='' className='me-2'>
+                                                    {/* <Button variant='' className='me-2' onClick={() => onEdit(market.id)}>
                                                         <Icon className="text-primary fs-4" icon='material-symbols:edit' />
-                                                    </Button>
+                                                    </Button> */}
                                                     <Button variant='' onClick={() => onDestroy(market.id, market.name)}>
                                                         <Icon className="text-secondary fs-4" icon='material-symbols:delete-outline' />
                                                     </Button>

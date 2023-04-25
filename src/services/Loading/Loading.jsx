@@ -1,5 +1,5 @@
 import React from 'react'
-import { Spin, Alert } from "antd";
+import { Spin } from "antd";
 
 function Loading() {
     const style = {

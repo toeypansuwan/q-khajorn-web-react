@@ -17,8 +17,6 @@ function FilterMapMarket(props) {
     const [selectValue, setSelectValue] = useState("");
     const dispatch = useDispatch();
 
-
-    // const [height, setHeight] = useState(500);
     const BASE_URL_API = import.meta.env.VITE_BASE_URL_API;
 
     const style = {

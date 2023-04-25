@@ -39,7 +39,6 @@ const checkAuth = () => {
 };
 const logoutUser = () => {
     localStorage.removeItem('accessToken');
-    // navigate('/system/login');
     return true;
 }
 

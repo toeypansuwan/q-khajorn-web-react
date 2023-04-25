@@ -1,6 +1,5 @@
 import { Icon } from '@iconify/react';
 import React, { useState, useRef, useEffect, useMemo } from 'react'
-// import { ImageMap } from "@qiuz/react-image-map";
 import ImageMapper from 'react-img-mapper';
 import { v4 } from 'uuid';
 import './ImageMapSection.css'

@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react'
-import PropTypes from 'prop-types'
-import { Upload, Button as ButtonAntd, message } from 'antd'
+import { Upload, Button as ButtonAntd } from 'antd'
 import ImageMapSection from '../ImageMapSection/ImageMapSection'
 import { Col, Row } from 'react-bootstrap'
 import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
 import AreaCreate from '../AreaCreate/AreaCreate'
 import { BASE_URL_API, beforeUpload } from '../../services/services'
-import axios from 'axios'
 const { Dragger } = Upload;
 
 const AreaInformationCollector = ({ planArea, setArea, options, setImagePlan, type }) => {
@@ -36,11 +34,6 @@ const AreaInformationCollector = ({ planArea, setArea, options, setImagePlan, ty
                                         setImagePlan([file])
                                     }
                                     if (file.status === 'removed') {
-                                        // axios.delete(`${BASE_URL_API}upload/file/${file.response?.filename}`).then(
-                                        //     message.success("ลบสำเร็จ")
-                                        // ).catch((error) => {
-                                        //     console.error(error)
-                                        // })
                                     }
                                 }} multiple={false} >
                                     <ButtonAntd icon={<UploadOutlined />}>อัพโหลดใหม่</ButtonAntd>
@@ -51,11 +44,6 @@ const AreaInformationCollector = ({ planArea, setArea, options, setImagePlan, ty
                                 setImagePlan([file])
                             }
                             if (file.status === 'removed') {
-                                // axios.delete(`${BASE_URL_API}upload/file/${file.response?.filename}`).then(
-                                //     message.success("ลบสำเร็จ")
-                                // ).catch((error) => {
-                                //     console.error(error)
-                                // })
                             }
                         }} multiple={false} >
                             <>

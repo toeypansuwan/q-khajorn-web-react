@@ -1,11 +1,9 @@
 import { message } from 'antd';
-import axios from 'axios';
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useState } from 'react'
 import { Image, Form, Container, Button } from 'react-bootstrap'
 import { loginUser, switchRich } from '../../services/AuthServices';
 import liff from '@line/liff/dist/lib';
-// import { Button } from 'antd'
 function LoginPage() {
     const [form, setForm] = useState({
         email: "",

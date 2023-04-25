@@ -1,10 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { Container, NavDropdown, Nav, Navbar, Image } from 'react-bootstrap';
+import { Container, Nav, Navbar, Image } from 'react-bootstrap';
 import { logoutUser } from '../services/AuthServices';
 import { useNavigate } from 'react-router-dom';
-// import { logoutUser } from '../services/AuthServices';
 
 const AdminLayout = props => {
     const navigate = useNavigate()

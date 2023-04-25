@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
-    data: {
-    },
+    data: {},
 }
 const filterMarketSlice = createSlice({
     name: 'marketStore',

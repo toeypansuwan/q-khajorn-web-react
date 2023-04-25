@@ -1,10 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Stack, Container, Button, Card, Form, FormCheck, Row, Col } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import { Link } from 'react-router-dom';
-import { LinkContainer } from 'react-router-bootstrap';
 import liff from '@line/liff'
 import { message, Spin } from 'antd';
 import axios from 'axios';
@@ -57,6 +55,7 @@ const PaymentGatewayPage = () => {
 
     const onClickConfirm = () => {
         setLoading(true);
+        console.log(profile)
         const data = {
             line_id: profile.userId,
             market_id: reserveStore.id_market,
@@ -111,7 +110,6 @@ const PaymentGatewayPage = () => {
                 {contextHolder}
                 <Container className='pt-3'>
                     <div className=" position-relative">
-                        {/* <button onClick={handleBack} className='btn position-absolute start-0 top-50 translate-middle-y'><Icon icon="eva:arrow-ios-back-fill" className='fs-3' /></button> */}
                         <h4 className='text-center'>ช่องทางการชำระเงิน</h4>
                     </div>
                     <Stack direction='horizontal' className='mt-3 justify-content-between'>
@@ -197,10 +195,7 @@ const PaymentGatewayPage = () => {
                             <Button variant='outline-primary' onClick={handleBack} className='w-100'>ย้อนกลับ</Button>
                         </Col>
                         <Col xs='8'>
-                            {/* <Button as={Link} to={`/profile-market/payment`} disabled={!confirm} className='w-100'>เลือกช่องทางชำระเงิน</Button> */}
-                            {/* <LinkContainer to={`/profile-market/payment`}> */}
                             <Button className={`w-100 `} disabled={!confirm} onClick={onClickConfirm}>ยืนยันจองแผง</Button>
-                            {/* </LinkContainer> */}
                         </Col>
                     </Row>
                 </div>
