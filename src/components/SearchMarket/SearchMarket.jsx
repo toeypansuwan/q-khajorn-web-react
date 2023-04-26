@@ -11,7 +11,7 @@ import axios from 'axios';
 import liff from '@line/liff';
 import { v4 as uuidv4 } from 'uuid';
 import { useSelector } from 'react-redux';
-import * as moment from 'moment';
+import moment from 'moment';
 import th from 'moment/dist/locale/th';
 import { useDispatch } from 'react-redux';
 import { addFilter } from '../../reducers/filterMarketSlice';
