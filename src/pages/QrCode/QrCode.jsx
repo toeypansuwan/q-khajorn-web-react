@@ -6,16 +6,19 @@ import { ExclamationCircleFilled } from '@ant-design/icons';
 import axios from 'axios'
 import { Modal, message } from 'antd'
 import liff from '@line/liff/dist/lib';
+import * as qrcode from 'qrcode';
 
 const QrCode = () => {
     const { orderId } = useParams();
     const { confirm } = Modal;
     const [order, setOrder] = useState(null);
+    const [url, setUrl] = useState(null);
     const [messageApi, contextHolder] = message.useMessage();
     useEffect(() => {
         if (!order) {
             fetchOrder();
         }
+        generateQRcode(order?.qr_code)
     }, [order])
     const fetchOrder = async () => {
         const orderData = await getOrderId(orderId);
@@ -49,6 +52,19 @@ const QrCode = () => {
             },
         });
     }
+
+    const generateQRcode = (payload) =>{
+        if(!payload){
+            return;
+        }
+        const options = { type: 'svg', color: { dark: '#000', light: '#fff' } }
+        qrcode.toDataURL(payload, options, (err, svg) => {
+            if (err) {
+                throw new Error(`qrcode: ${err}`);
+            }
+            setUrl(svg);
+        })
+    }
     return (
         <Container className='py-3'>
             {contextHolder}
@@ -65,7 +81,8 @@ const QrCode = () => {
                     within 10.minutes.</p>
                 <div className="text-center">
                     <Image width={100} src={`https://miro.medium.com/v2/resize:fit:1400/format:webp/1*nueyBV0RNEpETYMKpsYWhA.png`} />
-                    <Image width={300} src={`${BASE_URL_API}upload/qr-code/${order?.qr_code}`} />
+                    {url?(<Image width={300} src={url} />):null}
+                    
                 </div>
                 <div className="">
                     <Stack direction={'horizontal'} className='justify-content-between align-items-start'>
